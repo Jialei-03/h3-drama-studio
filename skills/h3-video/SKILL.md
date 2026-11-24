@@ -7,6 +7,8 @@ description: MiniMax H3 视频生成的模型与采样配方：底模和文本�
 
 在一张 RTX 5060 Ti 16 GB 上，用 ComfyUI 跑 MiniMax H3 做短剧，每一段怎么配、怎么排队、怎么比。部署和环境看 [local-ai-workstation](../local-ai-workstation/SKILL.md)；写镜头和提示词看 drama-scenes。
 
+现成的工作流在仓库根的 [workflows/](../../workflows/README.md)：文戏、带接续的文戏、武戏各一份，是作者实际提交给 ComfyUI 的原样。模型下载地址见 [models.md](../local-ai-workstation/references/models.md)。
+
 ## 先选配方：这一段是什么戏
 
 | | 文戏（对白、表演、反应） | 武戏（打斗、特效对轰） |

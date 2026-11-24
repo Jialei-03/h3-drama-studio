@@ -11,10 +11,16 @@ host:
   output_subdir: "h3_drama"   # 保存节点的文件名前缀目录：成片会落在 comfyui_output/<这个目录>/<id>_t<take>_*.mp4
 
 models:                   # 填你模型库里的文件名
-  unet: ""
-  text_encoder: ""
-  latent_upscaler: ""
-  fight_loras: []         # 武戏 LoRA 链：[{name: "", strength: 0.0}, ...]
+  # 下面是作者实际用的文件名；下载地址见 skills/local-ai-workstation/references/models.md。文件名以你下载到的为准。
+  unet: "Cobijada_H3_Hybrid_Uncensored_pruned_hybrid_int8_convrot_pruned.safetensors"
+  text_encoder: "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+  latent_upscaler: "minimax_h3_latent_upscaler_3d_conv_v1_fp16.safetensors"
+  fight_loras:            # 武戏 LoRA 链，按顺序串联；文戏不挂
+    - {name: "minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors", strength: 0.8}
+    - {name: "MysticXXX_MMH3-V1.safetensors", strength: 0.35}
+    - {name: "motion_speed_slider_mmh3_v1.1.safetensors", strength: 3.0}
+    - {name: "H3_Combat_V2.safetensors", strength: 0.65}
+    - {name: "Motion_Repair_V2.safetensors", strength: 0.35}
 
 image_api:                # 出参考图用，任何兼容 OpenAI 图像接口的服务
   base_url_env: "IMAGE_API_BASE"
@@ -43,33 +49,32 @@ recipe:
   up2: {w: 1536, h: 864, sched: [beta, 14], split: 8, sampler: euler}   # 二采宽高必须是 32 的倍数
   save_stage1: false                                    # true：同时把一采结果另存成 _stage1 视频，方便对比
 
-# ---- 你自己的 ComfyUI 工作流：scripts/drama_queue.py 按这张表改写它（仓库不带工作流文件）----
-# 先在 ComfyUI 里打开你自己的 H3 工作流，用菜单“导出 (API)”得到 json，填到 api_json；
-# 再把下面每个角色对应到 json 里的节点编号（节点右上角的数字，或直接看 json 的键）。
-# 下面填的编号对应 templates/workflow_skeleton.api.json（手写骨架，仅用来试 dry-run 和 check-map），换成你自己的。
-# 填完先跑：python3 scripts/drama_queue.py check-map
-# 每个角色 input 不写就用括号里的默认名；说明和限制见 skills/h3-video/references/queue.md“接入你自己的工作流”。
+# ---- ComfyUI 工作流：scripts/drama_queue.py 按这张表改写它 ----
+# 默认用仓库自带的 workflows/h3_base.api.json（作者实际出片用的基础工作流），下面的节点编号已经和它对好，可以直接用。
+# 想换成你自己的工作流：在 ComfyUI 里用菜单“导出 (API)”得到 json，填到 api_json，再把每个角色对应到你的节点编号。
+# 改完先跑：python3 scripts/drama_queue.py check-map
+# 说明和限制见 skills/h3-video/references/queue.md“接入你自己的工作流”。
 workflow:
-  api_json: ""            # 例：templates/workflow_skeleton.api.json
+  api_json: "workflows/h3_base.api.json"
   drop_nodes: []          # 要从你的导出里删掉的节点编号（例如你自己的工作流里原有的 LoRA 加载器；删了之后不能再有节点引用它们）
   nodes:
-    unet:         {node: "1",  input: unet_name}        # UNETLoader，主模型文件名
-    clip:         {node: "2",  input: clip_name}        # CLIPLoader，文本编码器文件名
-    prompt:       {node: "7",  input: prompt}           # MiniMaxH3ReferenceToVideo，正向提示词
-    width:        {node: "7",  input: width}            # 一采宽（如果你的宽高来自别的原始值节点，就填那个节点和它的输入名）
-    height:       {node: "7",  input: height}
-    length:       {node: "7",  input: length}           # 帧数
-    ref_size:     {node: "7",  input: ref_image_size}   # 参考图尺寸策略 match/max
-    ref_images:   {node: "7",  prefix: "ref_images.ref_image_"}   # 参考图输入的名字前缀，后面接 0、1、2……
-    seed:         {node: "11", input: noise_seed}       # RandomNoise，一采和二采共用
-    sampler:      {node: "9",  input: sampler_name}     # KSamplerSelect，一采采样器
-    sigmas:       {node: "10", input: sigmas}           # ManualSigmas，一采 sigma；shot 里写 sched 时整个节点会被换成 BasicScheduler
-    model_in:     {node: "5",  input: model}            # LoRA 链和 SigmaShift 的出口：链尾接到这个节点的 model 输入
-    cond:         {node: "7"}                           # 条件节点：输出0=正向条件，输出1=空潜空间
-    guider:       {node: "8"}                           # BasicGuider
-    pass1:        {node: "12"}                          # 一采 SamplerCustomAdvanced
-    video_vae:    {node: "3"}                           # 视频 VAELoader
-    audio_vae:    {node: "4"}                           # 音频 VAELoader
-    decode_video: {node: "13", input: samples}          # VAEDecode：samples 要直接接 pass1 的输出1
-    decode_audio: {node: "14", input: samples}          # VAEDecodeAudio：同上
-    save:         {node: "16", input: filename_prefix}  # SaveVideo
+    unet:         {node: "127", input: unet_name}        # UNETLoader，主模型文件名
+    clip:         {node: "232", input: clip_name}        # CLIPLoader，文本编码器文件名
+    prompt:       {node: "136", input: prompt}           # MiniMaxH3ReferenceToVideo，正向提示词
+    width:        {node: "136", input: width}            # 一采宽
+    height:       {node: "136", input: height}
+    length:       {node: "136", input: length}           # 帧数
+    ref_size:     {node: "136", input: ref_image_size}   # 参考图尺寸策略 match/max
+    ref_images:   {node: "136", prefix: "ref_images.ref_image_"}   # 参考图输入的名字前缀，后面接 0、1、2……
+    seed:         {node: "129", input: noise_seed}       # RandomNoise，一采和二采共用
+    sampler:      {node: "123", input: sampler_name}     # KSamplerSelect，一采采样器
+    sigmas:       {node: "255", input: sigmas}           # ManualSigmas，一采 sigma；shot 里写 sched 时整个节点会被换成 BasicScheduler
+    model_in:     {node: "156", input: model}            # LoRA 链和 SigmaShift 的出口：链尾接到这个节点的 model 输入
+    cond:         {node: "136"}                          # 条件节点：输出0=正向条件，输出1=空潜空间
+    guider:       {node: "126"}                          # BasicGuider
+    pass1:        {node: "125"}                          # 一采 SamplerCustomAdvanced
+    video_vae:    {node: "234"}                          # 视频 VAELoader
+    audio_vae:    {node: "235"}                          # 音频 VAELoader
+    decode_video: {node: "122", input: samples}          # VAEDecode：samples 要直接接 pass1 的输出1
+    decode_audio: {node: "121", input: samples}          # VAEDecodeAudio：同上
+    save:         {node: "save", input: filename_prefix} # SaveVideo

@@ -15,6 +15,7 @@ description: 在一台 16 GB 显存级别的 Windows 主机上部署和维护本
 |---|---|
 | 判断我的机器能不能跑、该升级什么 | [hardware.md](references/hardware.md) |
 | 装 ComfyUI、放模型、选 torch 的 CUDA 版本、新旧版本并排 | [comfyui-setup.md](references/comfyui-setup.md) |
+| 每个模型文件去哪下载（魔搭地址、大小、放哪个目录） | [models.md](references/models.md) |
 | 在同一张卡上跑本地文本模型（可选） | [llm-basalt.md](references/llm-basalt.md) |
 | 从另一台电脑用 SSH 或 Tailscale 连主机 | [remote-access.md](references/remote-access.md) |
 | 在国内下载大模型、代理软件开着 TUN 模式 | [china-network.md](references/china-network.md) |

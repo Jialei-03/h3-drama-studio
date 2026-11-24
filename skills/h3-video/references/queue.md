@@ -4,7 +4,7 @@
 
 队列脚本是 `scripts/drama_queue.py`，运行在出片主机上，用 ComfyUI 的 HTTP 接口提交任务。下面的字段和行为来自作者的原版脚本；仓库里的版本把路径改成了读 `config.yaml`（`host.queue_dir`、`host.comfyui_url`、`host.comfyui_output`、`host.comfyui_input`），并且**不再带工作流文件、不再写死节点编号**：你把自己导出的工作流和一张映射表填进 `config.yaml`，脚本按表改写节点，见本文末尾"接入你自己的工作流"。如有出入以脚本为准。
 
-状态：重写后的脚本在本机用手写骨架工作流和模拟的 ComfyUI 接口跑通了队列循环、续跑、接续截帧、拒绝处理；**没有提交给真实的 ComfyUI，未在干净环境端到端验证**。原版（节点编号写死的那份）出过作者的全部 281 段。
+状态：重写后的脚本用仓库自带的 `workflows/h3_base.api.json` 做 dry-run，生成的工作流和作者主机当时实际提交的两份（一段文戏、一段带接续的武戏）逐节点一致，结构和参数都相同；队列循环、续跑、接续截帧、拒绝处理用模拟的 ComfyUI 接口跑通过。**这个重写版脚本本身还没有向真实的 ComfyUI 提交过任务。**原版（节点编号写死的那份）出过作者的全部 281 段。
 
 子命令：`drama_queue.py run`（跑队列；`--dry-run` 只生成并打印将提交的工作流 json，不联网）、`check-map`（检查映射表）、`submit`（把一轮新 shots 合并进总清单，可 `--upload`）。
 
@@ -157,7 +157,7 @@ Remove-Item -Force "$R\STOP"
 ### 步骤
 
 1. 在 ComfyUI 里打开你自己的 H3 参考生视频工作流（先确认它在界面里能出一段片），用菜单"导出 (API)"保存 json。不是普通保存：普通保存的 json 有 `nodes` 列表，脚本会拒绝。
-2. 把路径填到 `workflow.api_json`，把下表的角色逐个对应到 json 里的节点编号（json 的顶层键就是编号；`class_type` 能帮你认节点）。`config.example.yaml` 里有填好的示例，编号对应 `templates/workflow_skeleton.api.json`。
+2. 把路径填到 `workflow.api_json`，把下表的角色逐个对应到 json 里的节点编号（json 的顶层键就是编号；`class_type` 能帮你认节点）。`config.example.yaml` 里填好的编号对应仓库自带的 `workflows/h3_base.api.json`，用它就不用改。
 3. `python3 scripts/drama_queue.py check-map`：核对节点在不在、类型对不对、关键连线是否符合脚本的假设，并列出哪些功能因为缺角色而不可用。
 4. `python3 scripts/drama_queue.py run --dry-run --shots shots.json --only <id> --save-dir 某目录`：不联网，把一条 shot 写进你的工作流，打印新增和被改写的节点、检查连线完整性（连线都指向存在的节点、无环），并存下完整 json。可以把存下的 json 拖进 ComfyUI 界面看一眼。
 5. 真提交前，每种新写法各出一段最短的：纯文戏、二采、首帧、接续（原因同"通宵运行"第 1 条）。

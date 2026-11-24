@@ -1,0 +1,487 @@
+{
+ "127": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "Cobijada_H3_Hybrid_Uncensored_pruned_hybrid_int8_convrot_pruned.safetensors",
+   "weight_dtype": "default"
+  },
+  "_meta": {
+   "title": "主模型"
+  }
+ },
+ "232": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+   "type": "minimax",
+   "device": "default"
+  },
+  "_meta": {
+   "title": "文本编码器"
+  }
+ },
+ "234": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+  },
+  "_meta": {
+   "title": "视频 VAE"
+  }
+ },
+ "235": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+  },
+  "_meta": {
+   "title": "音频 VAE"
+  }
+ },
+ "123": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  },
+  "_meta": {
+   "title": "一采采样器"
+  }
+ },
+ "255": {
+  "class_type": "ManualSigmas",
+  "inputs": {
+   "sigmas": "1, .9882, .973, .9524, .9231, .878, .8, .6316, .4737, .1579, 0"
+  },
+  "_meta": {
+   "title": "一采 sigma（10 步）"
+  }
+ },
+ "129": {
+  "class_type": "RandomNoise",
+  "inputs": {
+   "noise_seed": 7110
+  },
+  "_meta": {
+   "title": "种子"
+  }
+ },
+ "156": {
+  "class_type": "ModelAttentionBackend",
+  "inputs": {
+   "model": [
+    "shift",
+    0
+   ],
+   "attention": "comfy kitchen attention"
+  },
+  "_meta": {
+   "title": "注意力后端"
+  }
+ },
+ "165": {
+  "class_type": "BlockSparseAttention",
+  "inputs": {
+   "model": [
+    "156",
+    0
+   ],
+   "selection": "sol-attn",
+   "selection.tau": 1.3,
+   "start_percent": 0.2,
+   "end_percent": 1.0,
+   "dense_blocks": "",
+   "min_tokens": 12288,
+   "extra_tokens": 256,
+   "sink_conditioning": "exact_kv_and_rows",
+   "verbose": true
+  },
+  "_meta": {
+   "title": "稀疏注意力"
+  }
+ },
+ "136": {
+  "class_type": "MiniMaxH3ReferenceToVideo",
+  "inputs": {
+   "clip": [
+    "232",
+    0
+   ],
+   "prompt": "subject_definitions:\n<Subject 1> is the young East Asian actress playing Gemini in <Picture 1>, about twenty, with a cold, beautiful, serious face that does not smile; voluminous wavy hair dyed from blue to violet, two small hair buns topped with furry cat ears, a metal four-pointed star ornament at her temple, heterochromatic eyes exactly as in her reference picture, her right eye blue and her left eye gold, in every close-up, with no stars or glow in them; an off-shoulder purple-and-white cropped top that leaves her shoulders and collarbones bare, with no collar and no high neck, with wide flowing sheer purple sleeves, a frilled white-and-purple short skirt, a furry blue-to-violet cat tail, white slouch leg warmers and purple platform shoes; she fights bare-handed and never holds a sword or any weapon.\n<Subject 2> is the young East Asian actress playing GPT in <Picture 2>, about twenty-three, tall, regal and arrogant: a white-dragon woman with floor-length wavy silver-white hair, a pair of white curved dragon horns with small white flowers, pointed ears, pale violet eyes, an off-shoulder white ruffled long gown with sheer ruffled long sleeves and a floor-length skirt, membranous pale lavender-white dragon wings, a white scaled dragon tail, and one long straight double-edged longsword exactly as in her reference picture: a solid polished steel blade as long as her leg with a faint silver-lavender glow along its edges, a silver cross-guard and a silver hilt; it is real metal, never a beam of light and never a thin light-saber, and it keeps exactly the same shape and length in every shot; she always holds the longsword in her right hand with a normal forward grip, the blade extending from the thumb side of her fist, never a reverse grip and never in her left hand.\n<Subject 3> is the floating circular stone dueling arena from <Picture 3>, a real location: a colossal disc of weathered granite hanging above a sea of clouds at sunset, its floor made of huge cracked, worn stone slabs with moss in the joints and ancient circuit-like grooves carved into them that glow only faintly blue; eight towering black pillars of rough, rust-streaked iron-stone fins, smoke-stained, with blue flames burning on top; Colosseum-like tiered stone stands packed with spectators; and a tall ancient stone stele with a column of faintly glowing stone plaques at the edge; thin streams of water spill from its rocky underside into the clouds.\n\nsummary:\n[reference generation] Two hard-cut shots: GPT walks toward Gemini dragging her sword behind her in her right hand, stops, and mocks her for hiding; Gemini, standing perfectly still, answers that last time GPT called the shots and this time she will.\n\nretention_analysis:\n<Subject 1> (appears in [Shot 1], [Shot 2]): fully_preserved - the face, hairstyle, outfit, accessories, and signature color are retained.\n<Subject 2> (appears in [Shot 1]): fully_preserved - the face, hairstyle, outfit, accessories, and signature color are retained.\n<Subject 3> (appears in [Shot 1], [Shot 2]): fully_preserved - the layout, architecture, lighting, and key landmarks are retained.\n\ndetailed_description:\nThe target video is a photorealistic live-action superhero fantasy blockbuster in the style of a Marvel Studios film: real actresses in practical, tailored costumes, shot on large-format digital cinema cameras with anamorphic lenses and combined with seamless high-end visual effects. Faces are real human faces with natural proportions, visible skin texture, fine pores, subtle imperfections and real micro-expressions; hair is real dyed hair with individual strands that catch the light; costumes are real fabric, lace, leather and metal with stitching, creases and wear. Animal ears, dragon horns, wings and tails are flawless prosthetic and creature-effects work that sits naturally on the actresses. Energy effects such as starlight, dragon light and shockwaves are photoreal VFX that cast real light onto faces, costumes and the environment. It is absolutely not anime, not cartoon, not 3D game CG and not illustration. The lighting is cinematic: golden-hour backlight with warm rim light, atmospheric haze, volumetric light shafts, deep contrast, natural film grain, and shallow depth of field with real focus pulls. All action happens at real-world speed: strikes, dodges, leaps and impacts are fast, explosive and snappy, like real stunt performers filmed at normal speed; there is no slow motion, no speed ramp and no freeze frame. Physics is believable: hair, cloth, dust, water and debris react to wind, impacts and gravity with real weight and timing. Screen direction never flips: a character who is knocked back slides backward while still facing her attacker and never turns her back to her. Only the subjects defined above appear in the foreground; spectators stay in the background as an unnamed crowd; no text, subtitles, numbers or logos appear on screen unless described. Gemini's power is blue-to-violet starlight; GPT's power is silver-lavender dragon light. A war of words before the fight. GPT is relaxed and cruel; Gemini is completely still. GPT stops about ten strides from Gemini near the center of the floor. The video is 2 shots joined by hard cuts: every cut is a straight cut, with no dissolve, no fade and no transition effect.\nPositions: <Subject 3> is intact: the cracked old stone floor with faintly glowing runes, all eight black pillars standing with blue flames on top, banners on the packed stands. Golden sunset light, the low sun at screen right, warm rim light and haze. The camera stays on the near side of the line between the two fighters: Gemini on the left half of the arena at screen left facing right, GPT on the right half at screen right facing left. Nobody else is ever on the arena floor. <Subject 1> stands on the left half of the floor at screen left, facing screen right, perfectly still, her hands empty at her sides, her face cold. Gemini's outfit is intact and clean. <Subject 2> stands on the right half at screen right, facing screen left, her longsword hanging low in her right hand with the blade angled back behind her, a contemptuous smile on her lips. GPT's gown with its sheer ruffled long sleeves and floor-length skirt, and her wings, are intact and clean. The spectators in the stands are seated, leaning forward. The stands are packed with spectators far beyond the arena wall, small and out of focus; nobody sits or stands on the arena floor except the fighters, and there are no chairs, benches or lanterns on the floor. Both are ordinary human height, GPT half a head taller; each black pillar is about five times a person's height; the arena floor is as wide as a stadium, about two hundred strides across, so in wide shots the fighters are small against it and the packed stands tower around it. The sound is wind and murmuring.\n[Shot 1] A medium-wide side tracking shot from the near side at hip height, <Subject 1> small and soft at the far left edge of the frame: <Subject 2> walks across <Subject 3> from screen right toward screen left, toward Gemini, her body in profile; she holds the longsword only in her right hand, which is the hand on the far side of her body, away from the camera and partly hidden behind her; her left hand, the one nearest the camera, is empty and relaxed at her side the whole time, holding nothing; her right arm hangs back, so the whole blade trails out behind her toward screen right, slanting down to the floor, its point dragging along the stone a full stride behind her heels and scraping a spray of silver-lavender sparks; the blade is always behind her, never in front of her body and never in her left hand; she never switches hands. She says nothing for four or five steps, her head tilted, her lips curled in amusement; she stops near the center of the floor, about ten strides from Gemini, the sword point resting on the stone behind her, and only then GPT (S2), in a mature young female voice, smooth and elegant, arrogant and slightly drawling, says mockingly, <d>[Chinese]躲了这么久，就练出一双跑得快的腿？</d> The camera tracks alongside her at walking speed, slightly handheld, and stops when she stops.\n[Shot 2] Hard cut to a slowly arcing close-up of Gemini in three-quarter profile from her right side, at screen left, facing screen right, standing perfectly still, golden light on one side of her face and the stands soft behind her. The wind lifts a strand of hair across her face and she does not brush it away. Gemini (S1), in a young female voice around twenty, cool and clear mid-pitch, calm and measured pace, says coldly, <d>[Chinese]不。上次你说了算——这次，换我。</d> Her right eye is blue and her left eye is gold, exactly as in her reference picture. The camera keeps arcing slowly around her.\n\noverall_soundscape:\nThe scrape of a blade tip dragging on stone, crackling sparks, unhurried footsteps, nervous laughter in the stands; then only wind. No whoosh or transition sound is added at the hard cuts.\n\nnon_diegetic_music:\nN/A",
+   "vae": [
+    "234",
+    0
+   ],
+   "audio_vae": [
+    "235",
+    0
+   ],
+   "width": 1024,
+   "height": 576,
+   "length": 226,
+   "ref_image_size": "match",
+   "ref_images.ref_image_0": [
+    "i0",
+    0
+   ],
+   "ref_images.ref_image_1": [
+    "i1",
+    0
+   ],
+   "ref_images.ref_image_2": [
+    "i2",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "参考生视频：提示词、一采宽高、帧数"
+  }
+ },
+ "126": {
+  "class_type": "BasicGuider",
+  "inputs": {
+   "model": [
+    "165",
+    0
+   ],
+   "conditioning": [
+    "136",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采引导"
+  }
+ },
+ "125": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "129",
+    0
+   ],
+   "guider": [
+    "126",
+    0
+   ],
+   "sampler": [
+    "123",
+    0
+   ],
+   "sigmas": [
+    "255",
+    0
+   ],
+   "latent_image": [
+    "136",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "一采"
+  }
+ },
+ "121": {
+  "class_type": "VAEDecodeAudio",
+  "inputs": {
+   "samples": [
+    "s2",
+    1
+   ],
+   "vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "解码音频"
+  }
+ },
+ "122": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "s2",
+    1
+   ],
+   "vae": [
+    "234",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "解码视频"
+  }
+ },
+ "create": {
+  "class_type": "CreateVideo",
+  "inputs": {
+   "images": [
+    "122",
+    0
+   ],
+   "audio": [
+    "121",
+    0
+   ],
+   "fps": 24.0,
+   "bit_depth": 8
+  },
+  "_meta": {
+   "title": "合成视频"
+  }
+ },
+ "save": {
+  "class_type": "SaveVideo",
+  "inputs": {
+   "video": [
+    "create",
+    0
+   ],
+   "format": "mp4",
+   "filename_prefix": "h3-drama/h3_dialogue",
+   "format.codec": "h264",
+   "format.codec.encoding": "re-encode",
+   "format.codec.encoding.crf": 19.0
+  },
+  "_meta": {
+   "title": "保存成片"
+  }
+ },
+ "shift": {
+  "class_type": "MiniMaxH3SigmaShift",
+  "inputs": {
+   "model": [
+    "127",
+    0
+   ],
+   "shift_video": 12.0,
+   "shift_audio": 3.0
+  },
+  "_meta": {
+   "title": "SigmaShift 12/3"
+  }
+ },
+ "i0": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "char_a.png"
+  },
+  "is_changed": [
+   "8675cb7b2dc9999ace324ad006812c89041a8507b8c497aa79cf21de71c6ecb1"
+  ],
+  "_meta": {
+   "title": "参考图：人物 A 定妆图"
+  }
+ },
+ "i1": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "char_b.png"
+  },
+  "is_changed": [
+   "86684233e0b21da199d07b2fcf0499f120ad477250c3ebfe0c0758544ef70c05"
+  ],
+  "_meta": {
+   "title": "参考图：人物 B 定妆图"
+  }
+ },
+ "i2": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "scene.png"
+  },
+  "is_changed": [
+   "e47edc2b35539d88c9ba066d35679921e7851fad1f915afddd17aeade67225e3"
+  ],
+  "_meta": {
+   "title": "参考图：场景图"
+  }
+ },
+ "sep": {
+  "class_type": "LTXVSeparateAVLatent",
+  "inputs": {
+   "av_latent": [
+    "125",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "拆出视频潜变量"
+  }
+ },
+ "upm": {
+  "class_type": "LatentUpscaleModelLoader",
+  "inputs": {
+   "model_name": "minimax_h3_latent_upscaler_3d_conv_v1_fp16.safetensors"
+  },
+  "_meta": {
+   "title": "潜空间放大模型"
+  }
+ },
+ "up": {
+  "class_type": "MiniMaxH3LatentUpscaleWithModel",
+  "inputs": {
+   "model": [
+    "upm",
+    0
+   ],
+   "samples": [
+    "sep",
+    0
+   ],
+   "width": 1536,
+   "height": 864
+  },
+  "_meta": {
+   "title": "放大到二采尺寸"
+  }
+ },
+ "cat": {
+  "class_type": "LTXVConcatAVLatent",
+  "inputs": {
+   "video_latent": [
+    "up",
+    0
+   ],
+   "audio_latent": [
+    "sep",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "拼回音频潜变量"
+  }
+ },
+ "sch2": {
+  "class_type": "BasicScheduler",
+  "inputs": {
+   "model": [
+    "shift",
+    0
+   ],
+   "scheduler": "beta",
+   "steps": 14,
+   "denoise": 1.0
+  },
+  "_meta": {
+   "title": "二采调度（beta 14 步）"
+  }
+ },
+ "split2": {
+  "class_type": "SplitSigmas",
+  "inputs": {
+   "sigmas": [
+    "sch2",
+    0
+   ],
+   "step": 8
+  },
+  "_meta": {
+   "title": "从第 8 步切开"
+  }
+ },
+ "smp2": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  },
+  "_meta": {
+   "title": "二采采样器"
+  }
+ },
+ "s2": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "129",
+    0
+   ],
+   "guider": [
+    "126",
+    0
+   ],
+   "sampler": [
+    "smp2",
+    0
+   ],
+   "sigmas": [
+    "split2",
+    1
+   ],
+   "latent_image": [
+    "cat",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "二采（跑后 6 步）"
+  }
+ },
+ "p1v": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "125",
+    1
+   ],
+   "vae": [
+    "234",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采预览：解码视频"
+  }
+ },
+ "p1a": {
+  "class_type": "VAEDecodeAudio",
+  "inputs": {
+   "samples": [
+    "125",
+    1
+   ],
+   "vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采预览：解码音频"
+  }
+ },
+ "p1c": {
+  "class_type": "CreateVideo",
+  "inputs": {
+   "images": [
+    "p1v",
+    0
+   ],
+   "audio": [
+    "p1a",
+    0
+   ],
+   "fps": 24.0,
+   "bit_depth": 8
+  },
+  "_meta": {
+   "title": "一采预览：合成"
+  }
+ },
+ "p1s": {
+  "class_type": "SaveVideo",
+  "inputs": {
+   "video": [
+    "p1c",
+    0
+   ],
+   "format": "mp4",
+   "filename_prefix": "h3-drama/h3_dialogue_stage1",
+   "format.codec": "h264",
+   "format.codec.encoding": "re-encode",
+   "format.codec.encoding.crf": 19.0
+  },
+  "_meta": {
+   "title": "一采预览：保存"
+  }
+ }
+}

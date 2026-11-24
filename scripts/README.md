@@ -2,7 +2,7 @@
 
 全部脚本读 `config.yaml`（字段样例在仓库根的 `config.example.yaml`）和命令行参数，不写死路径、主机、模型文件名、镜头名、时间点。共用的小模块是 `_config.py`（找 `--config`、`$H3_CONFIG`、当前目录、仓库根的 `config.yaml`）。每个脚本的 `--help` 里有用途、输入、输出和用法示例。
 
-**验证状态（请先读）：出图与出片侧的脚本（`relay_img.py` 到 `asr.py`）没有在干净环境端到端验证。** 它们没有对真实的出图服务和真实的 ComfyUI 跑过。本机能做的验证是：`py_compile` 通过（Python 3.9、3.12、3.13）、`--help` 可用、`--dry-run` 走通数据流，以及用 localhost 上自己写的模拟接口跑通请求格式、队列循环、续跑和拒绝处理。具体见下面"验证了什么"。
+**验证状态（请先读）：出图与出片侧的脚本（`relay_img.py` 到 `asr.py`）没有在干净环境端到端验证。** 它们没有对真实的出图服务和真实的 ComfyUI 跑过。队列脚本有一项更强的验证：它 dry-run 生成的工作流和作者主机实际提交的工作流逐节点一致。本机能做的验证是：`py_compile` 通过（Python 3.9、3.12、3.13）、`--help` 可用、`--dry-run` 走通数据流，以及用 localhost 上自己写的模拟接口跑通请求格式、队列循环、续跑和拒绝处理。具体见下面"验证了什么"。
 
 ## 全部脚本
 
@@ -35,7 +35,7 @@ shots.json ──drama_queue.py run（config.yaml 的 workflow: + 你导出的 A
 成片 ──review_ep.py（内部用 asr.py）──▶ review_<take>.md
 ```
 
-带注释的示例数据在 `examples/gemini-revenge/data/`：`segments.example.yaml`（一段文戏、一段武戏）、`rules.example.yaml`、`keyframes.example.yaml`；后期侧有 `clips.example.yaml`（拼接清单）、`subs.example.tsv`（字幕卡）、`impacts.example.yaml`（冲击帧位置）、`bgm.example.yaml`（配乐参数）、`lyrics_times.example.tsv`（歌词时间表，占位数字）。`templates/workflow_skeleton.api.json` 是手写的工作流骨架，只用来试 `check-map` 和 `--dry-run`，不是能直接出片的工作流。
+带注释的示例数据在 `examples/gemini-revenge/data/`：`segments.example.yaml`（一段文戏、一段武戏）、`rules.example.yaml`、`keyframes.example.yaml`；后期侧有 `clips.example.yaml`（拼接清单）、`subs.example.tsv`（字幕卡）、`impacts.example.yaml`（冲击帧位置）、`bgm.example.yaml`（配乐参数）、`lyrics_times.example.tsv`（歌词时间表，占位数字）。。
 
 关键约定：
 
@@ -51,7 +51,7 @@ shots.json ──drama_queue.py run（config.yaml 的 workflow: + 你导出的 A
 | `relay_img.py`、`kf_batch.py` | `--dry-run` 打印提示词和请求格式；对 localhost 上的模拟接口跑通 generations（JSON）和 edits（multipart，`image[]` 多张）、Bearer 密钥头、b64 返回、失败重试和报错退出码 | 真实服务（不同服务对 `size`、`n`、`image[]` 的支持可能不同） |
 | `build_shots.py`、`make_full_script.py` | 用示例数据（文戏、武戏，另造了带 `first`、`last`、`ctx` 的 4 段测试数据）组装 shots.json 和中英文提示词，占位符解析、take 重映射、预设 | 其他故事的数据；shots.json 没有真的出片 |
 | `check_script.py` | 示例数据零问题；另造了十几处故意写错的用例（超时长、残留占位符、缺时间码、打戏台词、禁用词、错误锚点、`not_before` 等），逐项报出 | 规则覆盖面取决于你写的规则 |
-| `drama_queue.py` | 用手写骨架工作流：`check-map`（含故意填错的映射）、`run --dry-run`（含 up2、LoRA 链、首尾帧、`ctx`、`save_stage1` 的节点改写和连线完整性）、`submit` 合并；用 localhost 模拟的 ComfyUI 接口跑通真实队列循环：提交、轮询、写 `results.json`、联系表、`ctx` 的 ffmpeg 截取 22 帧、首帧取清晰帧、被拒绝的工作流计 2 次后跳过、`STOP` 退出 | 真实 ComfyUI 的类型校验和出片；`--upload` 的 scp（只打印了命令） |
+| `drama_queue.py` | 用仓库自带的 `workflows/h3_base.api.json` 做 dry-run，生成的工作流与作者主机实际提交的两份（文戏、带接续的武戏）逐节点一致。另用手写的测试工作流：`check-map`（含故意填错的映射）、`run --dry-run`（含 up2、LoRA 链、首尾帧、`ctx`、`save_stage1` 的节点改写和连线完整性）、`submit` 合并；用 localhost 模拟的 ComfyUI 接口跑通真实队列循环：提交、轮询、写 `results.json`、联系表、`ctx` 的 ffmpeg 截取 22 帧、首帧取清晰帧、被拒绝的工作流计 2 次后跳过、`STOP` 退出 | 真实 ComfyUI 的类型校验和出片；`--upload` 的 scp（只打印了命令） |
 | `review_ep.py`、`asr.py` | 一段真实的带台词成片：切点检测、mlx-whisper 听写、对剧本的 ✓ 判定、联系表；缓存命中 | openai-whisper 后端；批量多段和接续段的路径只用示例数据走过 |
 
 ## 后期侧怎么串起来

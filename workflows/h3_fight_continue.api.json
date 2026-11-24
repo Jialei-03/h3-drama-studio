@@ -1,0 +1,679 @@
+{
+ "127": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "Cobijada_H3_Hybrid_Uncensored_pruned_hybrid_int8_convrot_pruned.safetensors",
+   "weight_dtype": "default"
+  },
+  "_meta": {
+   "title": "主模型"
+  }
+ },
+ "232": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+   "type": "minimax",
+   "device": "default"
+  },
+  "_meta": {
+   "title": "文本编码器"
+  }
+ },
+ "234": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+  },
+  "_meta": {
+   "title": "视频 VAE"
+  }
+ },
+ "235": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+  },
+  "_meta": {
+   "title": "音频 VAE"
+  }
+ },
+ "123": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  },
+  "_meta": {
+   "title": "一采采样器"
+  }
+ },
+ "255": {
+  "class_type": "ManualSigmas",
+  "inputs": {
+   "sigmas": "1, .9882, .973, .9524, .9231, .878, .8, .6316, .4737, .1579, 0"
+  },
+  "_meta": {
+   "title": "一采 sigma（10 步）"
+  }
+ },
+ "129": {
+  "class_type": "RandomNoise",
+  "inputs": {
+   "noise_seed": 7720
+  },
+  "_meta": {
+   "title": "种子"
+  }
+ },
+ "156": {
+  "class_type": "ModelAttentionBackend",
+  "inputs": {
+   "model": [
+    "shift",
+    0
+   ],
+   "attention": "comfy kitchen attention"
+  },
+  "_meta": {
+   "title": "注意力后端"
+  }
+ },
+ "165": {
+  "class_type": "BlockSparseAttention",
+  "inputs": {
+   "model": [
+    "156",
+    0
+   ],
+   "selection": "sol-attn",
+   "selection.tau": 1.3,
+   "start_percent": 0.2,
+   "end_percent": 1.0,
+   "dense_blocks": "",
+   "min_tokens": 12288,
+   "extra_tokens": 256,
+   "sink_conditioning": "exact_kv_and_rows",
+   "verbose": true
+  },
+  "_meta": {
+   "title": "稀疏注意力"
+  }
+ },
+ "136": {
+  "class_type": "MiniMaxH3ReferenceToVideo",
+  "inputs": {
+   "clip": [
+    "232",
+    0
+   ],
+   "prompt": "subject_definitions:\n<Subject 1> is the young East Asian actress playing Gemini in <Picture 1> (her face exactly as in the large close-up on the left of that picture, her costume as in the three full-body views on the right), about twenty, with a cold, beautiful, serious face that does not smile; voluminous wavy hair dyed from blue to violet, two small hair buns topped with furry cat ears, a metal four-pointed star ornament at her temple, heterochromatic eyes exactly as in her reference picture, her right eye blue and her left eye gold, in every close-up, with no stars or glow in them; an off-shoulder purple-and-white cropped top that leaves her shoulders and collarbones bare, with no collar and no high neck, with wide flowing sheer purple sleeves, a frilled white-and-purple short skirt, a furry blue-to-violet cat tail, white slouch leg warmers and purple platform shoes; she fights bare-handed and never holds a sword or any weapon.\n<Subject 2> is the young East Asian actress playing GPT in <Picture 2> (her face exactly as in the large close-up on the left of that picture, her costume as in the three full-body views on the right), about twenty-three, tall, regal and arrogant: a white-dragon woman with floor-length wavy silver-white hair, a pair of white curved dragon horns with small white flowers, pointed ears, pale violet eyes, an off-shoulder white ruffled long gown with sheer ruffled long sleeves and a floor-length skirt, membranous pale lavender-white dragon wings, a white scaled dragon tail, and one long straight double-edged longsword exactly as in her reference picture: a solid polished steel blade as long as her leg with a faint silver-lavender glow along its edges, a silver cross-guard and a silver hilt; it is real metal, never a beam of light and never a thin light-saber, and it keeps exactly the same shape and length in every shot; she always holds the longsword in her right hand with a normal forward grip, the blade extending from the thumb side of her fist, never a reverse grip and never in her left hand.\n<Subject 3> is the floating circular stone dueling arena from <Picture 3>, a real location: a colossal disc of weathered granite hanging above a sea of clouds at sunset, its floor made of huge cracked, worn stone slabs with moss in the joints and ancient circuit-like grooves carved into them that glow only faintly blue; eight towering black pillars of rough, rust-streaked iron-stone fins, smoke-stained, with blue flames burning on top; Colosseum-like tiered stone stands packed with spectators; and a tall ancient stone stele with a column of faintly glowing stone plaques at the edge; thin streams of water spill from its rocky underside into the clouds.\n<Subject 4> is the Silver Dragon from <Picture 4>, GPT's summoned creature: a colossal eastern dragon made entirely of dense, glowing silver-white light and thousands of glittering scale-shaped particles, a long serpentine body far longer than the arena is wide, a mane and spines streaming like white fire, glowing eyes and a wide fanged jaw; it is light, not flesh, not fire and not a thin beam.\n\nsummary:\n[reference generation] The video continues straight on from the previous shot, a view straight down on GPT inside a spinning ring of Gemini's afterimages. Seven hard-cut shots: the ring from above; the afterimages whip up into the sky and converge into one point; Gemini snaps back into one body high above and in one instant a sphere of violet energy wider than the arena bursts into being above her hands; she shouts the name of her attack and the sphere collapses into a cannon beam of light; GPT summons her dragon to coil around her as a shield against the beam; the beam pounds the arena with tremendous violence; the coils burst and light swallows her.\n\nretention_analysis:\n<Subject 1> (appears in [Shot 3], [Shot 4]): fully_preserved - the face, hairstyle, outfit, accessories, and signature color are retained.\n<Subject 2> (appears in [Shot 2], [Shot 4], [Shot 5]): fully_preserved - the face, hairstyle, outfit, accessories, and signature color are retained.\n<Subject 3> (appears in [Shot 2], [Shot 3], [Shot 4], [Shot 5]): fully_preserved - the layout, architecture, lighting, and key landmarks are retained.\n<Subject 4> (appears in [Shot 5], [Shot 6], [Shot 7]): fully_preserved - the face, hairstyle, outfit, accessories, and signature color are retained.\n\ndetailed_description:\nThe target video is a photorealistic live-action superhero fantasy blockbuster in the style of a Marvel Studios film: real actresses in practical, tailored costumes, shot on large-format digital cinema cameras with anamorphic lenses and combined with seamless high-end visual effects. Faces are real human faces with natural proportions, visible skin texture, fine pores, subtle imperfections and real micro-expressions; hair is real dyed hair with individual strands that catch the light; costumes are real fabric, lace, leather and metal with stitching, creases and wear. Animal ears, dragon horns, wings and tails are flawless prosthetic and creature-effects work that sits naturally on the actresses. Energy effects such as starlight, dragon light and shockwaves are photoreal VFX that cast real light onto faces, costumes and the environment. It is absolutely not anime, not cartoon, not 3D game CG and not illustration. The lighting is cinematic: golden-hour backlight with warm rim light, atmospheric haze, volumetric light shafts, deep contrast, natural film grain, and shallow depth of field with real focus pulls. All action happens at real-world speed: strikes, dodges, leaps and impacts are fast, explosive and snappy, like real stunt performers filmed at normal speed; every frame plays at full real-time speed. Physics is believable: hair, cloth, dust, water and debris react to wind, impacts and gravity with real weight and timing. Screen direction never flips: a character who is knocked back slides backward while still facing her attacker and never turns her back to her. Only the subjects defined above appear in the foreground; spectators stay in the background as an unnamed crowd; no text, subtitles, numbers or logos appear on screen unless described. Gemini's power is blue-to-violet starlight; GPT's power is silver-lavender dragon light. The video consists of exactly the shots written below, in that order. The people in this video are Gemini, who stays high in the open sky for the whole video, and GPT, who stays on the arena floor beside the shallow trench for the whole video; GPT is seen from behind, from the side or from below. The pace is fast and violent from the first frame to the last and accelerates into the end: every beat is quick, short and snappy, and the video ends in the middle of motion, on an impact. Each shot keeps exactly the time range written for it. Fixed geography: the round floating stone arena is about 120 metres across; eight black pillars, each about seven times a person's height, stand around its rim with blue flames on top; the ancient stele stands on the far rim; the packed tiered stands ring it. Gemini and GPT are ordinary human height. All eight pillars stay standing; the cracks in the floor are dark, dry grey stone. Everything is on a huge scale, measured against the black pillars (each about five times a person's height) and the stands: every wave of energy, explosion, cloud of dust and shockwave is taller than a pillar and covers a large part of the arena. Nothing catches fire unless it is written. GPT's silver-lavender light is dense and glittering like liquid metal and scattering scales, not fire and not a thin beam; her slashes fly as broad crescent waves taller than a pillar and wide enough to span half the arena. Gemini's blue-violet starlight is just as big and heavy: it erupts from her hands as huge blazing masses of dense star-fire, each star-bolt a sphere as big as a person trailing a comet tail as wide as a door, her volleys pouring out like a wide river of light that fills a third of the frame; never thin beams, never laser lines, never small sparks, not fire and not lightning. No text appears in the picture. The video is 7 shots joined by hard cuts: every cut is a straight cut, with no dissolve, no fade and no transition effect. The video begins as a seamless continuation of the previous shot. Every hard cut is stated with its exact time; between hard cuts the camera moves only as described.\nPositions: GPT is on the floor near the center beside the shallow trench the whole time; Gemini is high in the sky above the arena. Nobody else is on the arena floor. The arena stays whole: all eight black pillars stand with blue flames on top; the only damage is one long shallow trench of broken grey stone and loose rubble on the left half of the floor, ankle-deep, dry and grey, a few cracked slabs, and a thin haze of settling dust.\n[Shot 1] 0.0–0.6 s. The video opens in the middle of the previous shot and continues it seamlessly: straight down from high above, <Subject 2> small in the middle of a spinning ring of blue-violet afterimages, slashing wildly.\nAt 0.6 s, hard cut.\n[Shot 2] 0.6–2.6 s. Framing: an 18mm ultra-wide lens low behind GPT's left shoulder beside the shallow trench, tilted up, her back and raised head in the lower right, the ring of afterimages around her, open sky above. Low behind <Subject 2> beside the shallow trench, looking up past her shoulder, the ring of afterimages around her.\nCamera: Tilt Up with large amplitude at fast speed, chasing the streaks of light from the floor straight up into the sky until they meet in one point.\n- 0.6–2.6 s: the ring of afterimages turns into lines of light that whip upward past GPT into the sky; the camera tilts up with them and they converge into one tiny point of light high above the arena.\nAt 2.6 s, hard cut.\n[Shot 3] 2.6–5.1 s. Framing: a 35mm lens in the open sky at Gemini's height, exactly side-on, a medium-wide frame, the arena small far below at the lower right. <Subject 1> is seen strictly in profile from her left side, facing screen right, her face turned toward the arena below and never toward the camera.\nCamera: holds on her, then at 4.0 s, at the instant the sphere appears, the camera is blasted backward in one violent jolt, a snap pull-out that brings the whole colossal sphere into frame, then shakes.\n- 2.6–3.6 s: the streaks slam into her from every direction and she snaps into one solid body, hair and sleeves whipping.\n- 3.6–4.0 s: she throws both arms up over her head, one tiny bright violet spark between her palms.\n- 4.0–5.1 s: in a single instant, with a sharp ringing ping and a blinding flash, the spark bursts into a colossal sphere of violet energy already at its full size, wider than the whole arena; it does not grow, it is simply there at once, and the blast of its appearance whips her hair and sleeves back; it hangs above her crackling with starlight.\nAt 5.1 s, hard cut.\n[Shot 4] 5.1–7.6 s. Framing: a 14mm ultra-wide lens on the floor right beside GPT, pointing straight up, her shoulder, wing and raised sword at the bottom edge of the frame, the sky filling the rest. On the arena floor right beside <Subject 2>, looking straight up past her shoulder and raised sword.\nCamera: Static Shot pointing straight up, shuddering harder and harder as the sphere fills the sky and the wind slams down; when the beam falls it rushes straight into the lens.\n- 5.1–6.1 s: the colossal violet sphere fills the entire sky and blots out the sunset; the whole arena drops into its violet shadow; a downward blast of wind flattens GPT's hair and wings and lifts dust and pebbles off the floor.\n- 6.1–6.8 s: far above, Gemini is a small dark silhouette against the sphere; she thrusts both arms down and roars in one short burst, Gemini (S1), in a young female voice around twenty, cool and clear mid-pitch, calm and measured pace, <d>[English]Supernova!</d>\n- 6.8–7.6 s: the sphere collapses into a colossal cannon beam of violet light, wider than three pillars, that slams straight down at GPT and the camera with tremendous violence, the air around it rippling and the clouds blasted apart.\nAt 7.6 s, hard cut.\n[Shot 5] 7.6–8.8 s. Framing: a 24mm wide lens at knee height beside GPT, exactly side-on, framing her from the knees up in profile facing screen left, her face tilted up toward the beam and never toward the camera, a slight Dutch tilt.\nCamera: Handheld, Shake Strongly and more violently with every blow, pushed down lower and lower by the weight of the beam.\n- 7.6–8.2 s: GPT thrusts her longsword straight up in her right hand and the colossal Silver Dragon bursts out of the blade and wraps itself around her in tight glowing coils, its scales locking together into a living shield over her head.\n- 8.2–8.8 s: the beam crashes onto the dragon's coils with tremendous violence; violet fire sprays off the silver scales, the dragon roars, rings of shockwave blast outward, the slabs under GPT's feet crack outward in rings and debris flies up; she cries out with effort, her knees buckling.\nAt 8.8 s, hard cut.\n[Shot 6] 8.8–9.4 s. Framing: an extreme wide low shot across the arena floor, the beam a colossal pillar of violet light crashing into the middle of the arena, the glowing coils of the dragon just visible inside it.\nCamera: Static, shaking violently.\n- 8.8–9.4 s: the beam pounds down harder still; the floor around it buckles into a shallow dent; shockwave after shockwave and a ring of dust and debris explode outward across the floor toward the camera.\nAt 9.4 s, hard cut.\n[Shot 7] 9.4–9.9 s. Framing: the same side-on view of GPT from the knees up, in profile, inside the dragon's coils.\n- 9.4–9.9 s: the dragon's coils burst apart into scattering silver light and she is swallowed by the violet-white light, which floods the whole frame.\noverall_soundscape:\nA rising chorus of whooshes streaking upward; comet-like impacts converging into one deep thrum; a sharp crystalline ping and an instant thunderclap as the sphere bursts into being; a swelling, crackling roar of gathering energy and a howling downdraft; a roared shout far above and a thunderous, deepening roar as the beam falls; a dragon's roar, a grinding scream of energy on scales, stone cracking in rings and a strained cry; crushing booms of shockwaves and a swelling roar of light to a deafening peak. No whoosh or transition sound is added at the hard cuts.\n\nnon_diegetic_music:\nN/A",
+   "vae": [
+    "234",
+    0
+   ],
+   "audio_vae": [
+    "235",
+    0
+   ],
+   "width": 1024,
+   "height": 576,
+   "length": 260,
+   "ref_image_size": "match",
+   "ref_images.ref_image_0": [
+    "i0",
+    0
+   ],
+   "ref_images.ref_image_1": [
+    "i1",
+    0
+   ],
+   "ref_images.ref_image_2": [
+    "i2",
+    0
+   ],
+   "ref_images.ref_image_3": [
+    "i3",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "参考生视频：提示词、一采宽高、帧数"
+  }
+ },
+ "126": {
+  "class_type": "BasicGuider",
+  "inputs": {
+   "model": [
+    "165",
+    0
+   ],
+   "conditioning": [
+    "g_ctx",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采引导"
+  }
+ },
+ "125": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "129",
+    0
+   ],
+   "guider": [
+    "126",
+    0
+   ],
+   "sampler": [
+    "123",
+    0
+   ],
+   "sigmas": [
+    "255",
+    0
+   ],
+   "latent_image": [
+    "136",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "一采"
+  }
+ },
+ "121": {
+  "class_type": "VAEDecodeAudio",
+  "inputs": {
+   "samples": [
+    "s2",
+    1
+   ],
+   "vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "解码音频"
+  }
+ },
+ "122": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "s2",
+    1
+   ],
+   "vae": [
+    "234",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "解码视频"
+  }
+ },
+ "create": {
+  "class_type": "CreateVideo",
+  "inputs": {
+   "images": [
+    "122",
+    0
+   ],
+   "audio": [
+    "121",
+    0
+   ],
+   "fps": 24.0,
+   "bit_depth": 8
+  },
+  "_meta": {
+   "title": "合成视频"
+  }
+ },
+ "save": {
+  "class_type": "SaveVideo",
+  "inputs": {
+   "video": [
+    "create",
+    0
+   ],
+   "format": "mp4",
+   "filename_prefix": "h3-drama/h3_fight_continue",
+   "format.codec": "h264",
+   "format.codec.encoding": "re-encode",
+   "format.codec.encoding.crf": 19.0
+  },
+  "_meta": {
+   "title": "保存成片"
+  }
+ },
+ "lora0": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "127",
+    0
+   ],
+   "lora_name": "minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors",
+   "strength_model": 0.8
+  },
+  "_meta": {
+   "title": "武戏 LoRA 1"
+  }
+ },
+ "lora1": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "lora0",
+    0
+   ],
+   "lora_name": "MysticXXX_MMH3-V1.safetensors",
+   "strength_model": 0.35
+  },
+  "_meta": {
+   "title": "武戏 LoRA 2"
+  }
+ },
+ "lora2": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "lora1",
+    0
+   ],
+   "lora_name": "motion_speed_slider_mmh3_v1.1.safetensors",
+   "strength_model": 3.0
+  },
+  "_meta": {
+   "title": "武戏 LoRA 3"
+  }
+ },
+ "lora3": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "lora2",
+    0
+   ],
+   "lora_name": "H3_Combat_V2.safetensors",
+   "strength_model": 0.65
+  },
+  "_meta": {
+   "title": "武戏 LoRA 4"
+  }
+ },
+ "lora4": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "lora3",
+    0
+   ],
+   "lora_name": "Motion_Repair_V2.safetensors",
+   "strength_model": 0.35
+  },
+  "_meta": {
+   "title": "武戏 LoRA 5"
+  }
+ },
+ "shift": {
+  "class_type": "MiniMaxH3SigmaShift",
+  "inputs": {
+   "model": [
+    "lora4",
+    0
+   ],
+   "shift_video": 12.0,
+   "shift_audio": 3.0
+  },
+  "_meta": {
+   "title": "SigmaShift 12/3"
+  }
+ },
+ "i0": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "char_a.png"
+  },
+  "is_changed": [
+   "f2bf94672379bc84eaa41653e8f2b244e2fd68bc9239d75ccc9e77826e9a9e57"
+  ],
+  "_meta": {
+   "title": "参考图：人物 A 定妆图"
+  }
+ },
+ "i1": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "char_b.png"
+  },
+  "is_changed": [
+   "dfa897dbb76ff2927fe544c8f077073307d61a9f14398fac8ab9811291a86b4b"
+  ],
+  "_meta": {
+   "title": "参考图：人物 B 定妆图"
+  }
+ },
+ "i2": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "scene.png"
+  },
+  "is_changed": [
+   "e47edc2b35539d88c9ba066d35679921e7851fad1f915afddd17aeade67225e3"
+  ],
+  "_meta": {
+   "title": "参考图：场景图"
+  }
+ },
+ "i3": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "summon.png"
+  },
+  "is_changed": [
+   "0c954612157211eb96b2e0b9596fab2413c06e1c5c53176d15b60757fbfc2783"
+  ],
+  "_meta": {
+   "title": "参考图：召唤物图"
+  }
+ },
+ "c_lv": {
+  "class_type": "LoadVideo",
+  "inputs": {
+   "file": "prev_tail_22f.mp4"
+  },
+  "is_changed": [
+   1795301603.131783
+  ],
+  "_meta": {
+   "title": "接续：上一段末尾 22 帧的小视频"
+  }
+ },
+ "c_gvc": {
+  "class_type": "GetVideoComponents",
+  "inputs": {
+   "video": [
+    "c_lv",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "接续：拆出画面和声音"
+  }
+ },
+ "g_ctx": {
+  "class_type": "MiniMaxH3AddGuide",
+  "inputs": {
+   "positive": [
+    "136",
+    0
+   ],
+   "latent": [
+    "136",
+    1
+   ],
+   "frame_idx": 0,
+   "vae": [
+    "234",
+    0
+   ],
+   "image": [
+    "c_gvc",
+    0
+   ],
+   "audio": [
+    "c_gvc",
+    1
+   ],
+   "audio_vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "接续：锚在第 0 帧（一采）"
+  }
+ },
+ "sep": {
+  "class_type": "LTXVSeparateAVLatent",
+  "inputs": {
+   "av_latent": [
+    "125",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "拆出视频潜变量"
+  }
+ },
+ "upm": {
+  "class_type": "LatentUpscaleModelLoader",
+  "inputs": {
+   "model_name": "minimax_h3_latent_upscaler_3d_conv_v1_fp16.safetensors"
+  },
+  "_meta": {
+   "title": "潜空间放大模型"
+  }
+ },
+ "up": {
+  "class_type": "MiniMaxH3LatentUpscaleWithModel",
+  "inputs": {
+   "model": [
+    "upm",
+    0
+   ],
+   "samples": [
+    "sep",
+    0
+   ],
+   "width": 1536,
+   "height": 864
+  },
+  "_meta": {
+   "title": "放大到二采尺寸"
+  }
+ },
+ "cat": {
+  "class_type": "LTXVConcatAVLatent",
+  "inputs": {
+   "video_latent": [
+    "up",
+    0
+   ],
+   "audio_latent": [
+    "sep",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "拼回音频潜变量"
+  }
+ },
+ "sch2": {
+  "class_type": "BasicScheduler",
+  "inputs": {
+   "model": [
+    "shift",
+    0
+   ],
+   "scheduler": "beta",
+   "steps": 14,
+   "denoise": 1.0
+  },
+  "_meta": {
+   "title": "二采调度（beta 14 步）"
+  }
+ },
+ "split2": {
+  "class_type": "SplitSigmas",
+  "inputs": {
+   "sigmas": [
+    "sch2",
+    0
+   ],
+   "step": 8
+  },
+  "_meta": {
+   "title": "从第 8 步切开"
+  }
+ },
+ "smp2": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  },
+  "_meta": {
+   "title": "二采采样器"
+  }
+ },
+ "g2_ctx": {
+  "class_type": "MiniMaxH3AddGuide",
+  "inputs": {
+   "positive": [
+    "136",
+    0
+   ],
+   "latent": [
+    "cat",
+    0
+   ],
+   "frame_idx": 0,
+   "vae": [
+    "234",
+    0
+   ],
+   "image": [
+    "c_gvc",
+    0
+   ],
+   "audio": [
+    "c_gvc",
+    1
+   ],
+   "audio_vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "接续：锚在第 0 帧（二采，放大后重新加）"
+  }
+ },
+ "guider2": {
+  "class_type": "BasicGuider",
+  "inputs": {
+   "model": [
+    "165",
+    0
+   ],
+   "conditioning": [
+    "g2_ctx",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "二采引导"
+  }
+ },
+ "s2": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "129",
+    0
+   ],
+   "guider": [
+    "guider2",
+    0
+   ],
+   "sampler": [
+    "smp2",
+    0
+   ],
+   "sigmas": [
+    "split2",
+    1
+   ],
+   "latent_image": [
+    "cat",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "二采（跑后 6 步）"
+  }
+ },
+ "p1v": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "125",
+    1
+   ],
+   "vae": [
+    "234",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采预览：解码视频"
+  }
+ },
+ "p1a": {
+  "class_type": "VAEDecodeAudio",
+  "inputs": {
+   "samples": [
+    "125",
+    1
+   ],
+   "vae": [
+    "235",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "一采预览：解码音频"
+  }
+ },
+ "p1c": {
+  "class_type": "CreateVideo",
+  "inputs": {
+   "images": [
+    "p1v",
+    0
+   ],
+   "audio": [
+    "p1a",
+    0
+   ],
+   "fps": 24.0,
+   "bit_depth": 8
+  },
+  "_meta": {
+   "title": "一采预览：合成"
+  }
+ },
+ "p1s": {
+  "class_type": "SaveVideo",
+  "inputs": {
+   "video": [
+    "p1c",
+    0
+   ],
+   "format": "mp4",
+   "filename_prefix": "h3-drama/h3_fight_continue_stage1",
+   "format.codec": "h264",
+   "format.codec.encoding": "re-encode",
+   "format.codec.encoding.crf": 19.0
+  },
+  "_meta": {
+   "title": "一采预览：保存"
+  }
+ }
+}

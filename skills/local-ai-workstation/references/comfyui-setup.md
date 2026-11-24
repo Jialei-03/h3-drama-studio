@@ -52,7 +52,7 @@ $env:PYTHONPATH = "<overlay>"
 | 武戏 LoRA | 见 h3-video 的 lora.md | `loras/` | `models.fight_loras` | 未记录 |
 | 参考图、首帧 | 你自己的图 | ComfyUI 的 `input/` | | |
 
-模型从哪里下载、怎样在国内直连，见 [china-network.md](china-network.md)。本仓库不分发任何模型文件。
+每个文件的魔搭下载地址见 [models.md](models.md)；怎样在国内确认是直连，见 [china-network.md](china-network.md)。本仓库不分发任何模型文件。现成的工作流在仓库根的 `workflows/`。
 
 ### 模型必须是实体文件，不要用符号链接
 

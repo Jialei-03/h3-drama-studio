@@ -22,7 +22,6 @@
 
 | 文件 | 用来做什么 |
 |---|---|
-| [workflow_skeleton.api.json](workflow_skeleton.api.json) | ComfyUI 工作流的骨架（API 格式，只有节点和连线，模型文件名是占位）：用来演示 `scripts/drama_queue.py` 的映射表、`check-map` 和 `run --dry-run`，**不是能直接出片的完整工作流**；用法以该脚本开头的说明为准 |
 
 项目专属的数据文件（分段提示词数据、检查规则）的带注释示例不在这里，在 [../examples/gemini-revenge/data/](../examples/gemini-revenge/data/)：`segments.example.yaml`（`scripts/build_shots.py` 的输入）和 `rules.example.yaml`（`scripts/check_script.py` 的规则）。
 

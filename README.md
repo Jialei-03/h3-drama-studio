@@ -2,7 +2,7 @@
 
 一张 16 GB 显卡，从剧本到成片：本地 AI 短剧的一站式 Claude Code skills（MiniMax H3 + ComfyUI）。
 
-> 状态：初版。skills、脚本、模板和案例都已齐。后期脚本用真实片段跑过；出图和队列脚本只做过不联网的试运行，还没有在干净环境里端到端验证。
+> 状态：初版。skills、脚本、模板、案例、工作流和模型下载表都已齐。后期脚本用真实片段跑过；队列脚本生成的工作流和作者主机实际提交的逐节点一致，但重写后的脚本本身还没有向真实的 ComfyUI 提交过任务；出图脚本只做过不联网的试运行。
 
 经验的优先顺序：**故事 > 提示词 > 工作流 > 模型**。
 
@@ -66,6 +66,13 @@
 
 另有 [scripts/](scripts/README.md)、[templates/](templates/README.md) 和一个完整案例 [examples/gemini-revenge/](examples/gemini-revenge/README.md)。
 
+## 现成的工作流和模型地址
+
+- **工作流**：[workflows/](workflows/README.md) 里是作者出这部片时实际提交给 ComfyUI 的工作流，文戏、带接续的文戏、武戏各一份，另有一份给队列脚本用的基础工作流。全部是 ComfyUI 内置节点，放好模型和参考图就能跑。
+- **模型**：[模型下载表](skills/local-ai-workstation/references/models.md) 列出了全部 10 个模型文件的文件名、大小、放哪个目录和魔搭（ModelScope）地址，国内可以直连下载。必需的 5 个约 55 GB，武戏 LoRA 5 个约 1.9 GB。
+
+工作流的二采结构、接续方法和 LoRA 搭配学自几位创作者，出处写在 [workflows/README.md](workflows/README.md) 和下面的致谢里。
+
 ## 安装
 
 ### 方式一：作为 Claude Code 插件安装
@@ -114,4 +121,4 @@ cp config.example.yaml config.yaml    # config.yaml 已在 .gitignore 里，不�
 
 ## 许可
 
-代码 MIT，文档 CC BY 4.0，见 [LICENSE](LICENSE)。本仓库不包含任何模型、音乐或第三方工作流文件。
+代码 MIT，文档 CC BY 4.0，见 [LICENSE](LICENSE)。本仓库不包含任何模型文件和音乐。`workflows/` 里是作者自己出片用的工作流，方法的出处见该目录的说明。

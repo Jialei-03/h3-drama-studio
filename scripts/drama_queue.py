@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """出片队列：按 shots.json 一段接一段往 ComfyUI 提交任务，写 results.json；运行在出片主机上。
 
-重点：脚本**不带任何工作流文件**。你自己在 ComfyUI 里打开自己的 H3 工作流，用"导出 (API)"得到 json，
-然后在 config.yaml 的 workflow: 里填：json 路径 + "角色 → 节点编号/输入名"的映射表。脚本按映射表改写节点：
+重点：默认用仓库自带的 workflows/h3_base.api.json，config.example.yaml 里的映射表已经和它对好。
+想用自己的工作流：在 ComfyUI 里用"导出 (API)"得到 json，在 config.yaml 的 workflow: 里填 json 路径和"角色 → 节点编号/输入名"的映射表。脚本按映射表改写节点：
   - 改值：模型文件名、提示词、宽高帧数、种子、采样器、sigma、参考图、保存前缀；
   - 自动加节点：LoRA 链、SigmaShift、首尾帧/接续锚点（MiniMaxH3AddGuide）、专属二采（潜空间放大+重新加噪+后半段采样）、一采单独存视频。
 哪些要你的工作流里已经有、哪些由脚本加、限制在哪，见 skills/h3-video/references/queue.md 的"接入你自己的工作流"一节。
@@ -18,8 +18,8 @@
   python3 scripts/drama_queue.py run                       # 在主机上，读 config.yaml 的 host.queue_dir
   python3 scripts/drama_queue.py submit round.json --master shots.json --upload
 
-状态：本机用骨架工作流（templates/workflow_skeleton.api.json，自己手写，只有节点和连线）验证了映射、节点改写和连线完整性；
-      没有真的提交给 ComfyUI，未在干净环境端到端验证。
+状态：用仓库自带的 workflows/h3_base.api.json 做 dry-run，生成的工作流和作者主机当时实际提交的两份（一段文戏、一段带接续的武戏）
+      逐节点一致（结构和参数都相同）；但这个重写版脚本本身还没有真的向 ComfyUI 提交过任务。
 配方出处：专属二采来自吃猪侠233，上下文接续来自惊尘（见 skills/h3-video/references/credits.md）。
 """
 import argparse
