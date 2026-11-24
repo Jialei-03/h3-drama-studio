@@ -1,0 +1,51 @@
+# 配乐参数：scripts/mix_bgm.py 的输入。本仓库不带音乐，请用你有授权的歌（--song 指定，或写在 tracks[].file）。
+#   python3 scripts/mix_bgm.py bgm.example.yaml film_subs.mp4 film_bgm.mp4 --song your_licensed_song.flac
+# 下面的数字是作者这部片、这一首歌的实测值（见 bgm.md）：换歌、换片都要重新量，不要照抄。
+# 所有"片中时间"按写参数时的时间线写，经过 shifts 平移后才使用；歌曲里的时间（song_time）不平移。
+
+# 剪过片：时间 >= at 的统一加 delta（负数 = 前移）。这里：0:41.7 剪了 6 帧、1:03.3 剪了 14 帧（24 fps）。
+shifts:
+  - {at: 41.7, delta: -0.25}
+  - {at: 63.3, delta: -0.5833}
+
+film_gain_db: 4.0        # 原片声音（对白+音效）整体加响 4 dB；不压低任何原声
+shouts:                  # 喊招等需要突出的原声段：只放大这一小段原声，不动音乐。两端各 ramp 秒渐变。
+  - {start: 150.35, end: 151.40, db: 4, ramp: 0.15}
+
+tracks:
+  - file: path/to/your_licensed_song.flac       # 或用 --song
+    # 从结尾反推对齐：歌曲里"高潮收尾那一句的重拍"（实测鼓点起音）↔ 片中最后一个大招的冲击帧（帧号 ÷ fps）
+    align: {song_time: 180.68, film_time: 153.96}   # 偏移 OFF = film_time - song_time，片中 = 歌曲 + OFF
+    fade_in: [81.5, 83.0]                        # 音乐在片中 81.5 s 进入，1.5 s 余弦淡入；不要超过 2 s（6 秒版用户嫌慢）
+    fade_out: [167.9, 168.0]                     # 可省：省了就唱到歌曲自然结束。这里歌在片中 162 s 左右就结束了，这一行只是兜底
+    gain_db: 0                                   # 这首歌单独的微调
+
+music:
+  gain_db: -14.5                                 # 音乐总增益。歌曲母带通常很响，要降十几 dB；也可以改写 target_lufs: -21.8 让脚本按使用段响度自动算
+  # target_lufs: -21.8
+  # measure_range: [85, 150]
+  leveler:                                       # 校平：让音乐响度从淡入完成后全程一致
+    ref: [85, 150]                               # 参考值 = 这一段短时响度的中位数（打斗主段）
+    max_db: 8                                    # 修正量上限 ±8 dB，不把原曲自然的淡出、间奏硬拉起来
+    window: 2.0                                  # 短时响度的窗口（秒）
+    smooth: 1.0                                  # 修正量的平滑（秒）
+    floor_db: 30                                 # 比参考值低 30 dB 以上的地方视为没声音，不修正
+    start: 83.0                                  # 淡入结束之后才渐入，不改淡入本身
+    ramp: 0.5
+  boosts:                                        # 关键点推高：最后两声唱得轻、又落在爆炸后的尘土声里，单独推高 4 dB
+    - {rise: [153.5, 154.0], db: 4}              # fall 省了 = 一直保持到片尾；要回落就写 fall: [起, 止]
+  tail:                                          # 原曲最后一声骤停时的混响尾巴（歌自然唱完、不骤停就删掉这一段）
+    take: [160.8, 162.3]                         # 取这一段音乐去做混响
+    fade_out: [164.0, 168.0]                     # 余音慢慢淡掉
+    wet_db: -15.5                                # 湿声音量，相对取样段 RMS
+    ir_len: 8                                    # 混响冲激响应长度（秒）
+    decay_60db: 15                               # 衰减 60 dB 用多少秒
+    lowpass: 0.6                                 # 一阶低通系数，让尾巴更暖
+    predelay_ms: 20
+    seed: 1
+
+limiter:                                         # 混音后限幅；编码后实测真峰值 -1.6 dBTP（单次）。超过 -1.5 就把 limit 调低（例 0.75）
+  limit: 0.8
+  attack: 5
+  release: 80
+aac_bitrate: 256k

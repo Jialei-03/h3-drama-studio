@@ -1,0 +1,10 @@
+config.yaml
+__pycache__/
+*.pyc
+.DS_Store
+*.mp4
+*.wav
+*.flac
+*.mp3
+*.safetensors
+!assets/*.mp4

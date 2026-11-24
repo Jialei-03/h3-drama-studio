@@ -1,0 +1,137 @@
+# 分段提示词数据文件示例：scripts/build_shots.py 的输入，也是 make_full_script.py 和 check_script.py 的数据来源。
+#
+# 这里只放一段文戏（g2）和一段武戏（f1），用来演示结构。提示词正文是按
+# skills/drama-scenes/references/prompt-structure.md 写的简短示范，不是作者出片用的原文。
+# 每个文字字段写成 {en, zh}：英文拿去渲染，中文给人审，由同一份数据生成所以一一对应。
+# 写成纯字符串则两种语言共用（例如声线名、文件名）。
+#
+# 文字里可以用的占位符：
+#   {GEM}     本段 refs 里的角色/场景：换成 <Subject N>（英文）/<主体N>（中文）；不在 refs 里就换成 characters.<KEY>.name
+#   {V_GEM}   voices.GEM 里的声线描述，每段逐字复制，不要自己改
+#   {@A0}     phrases.A0 里的固定说法（状态表）：同一个状态永远用同一句话
+#   {p}       只用在 characters.<KEY>.define 里：换成 <Picture N>/<图N>
+
+title: {en: "Gemini's Revenge (example)", zh: "《Gemini的复仇！》示例"}
+defaults: {seed: 7100, take: 1}
+
+# ---- 风格段：全片逐字相同，每段都会复制进 detailed_description 开头 ----
+style:
+  en: >-
+    The target video is a photorealistic live-action fantasy blockbuster: real actresses in practical costumes,
+    shot on large-format digital cinema cameras with anamorphic lenses, with high-end visual effects composited into the plate.
+    Faces are real human faces with visible skin texture; hair and fabric react to wind with real weight.
+    All action plays at real-world speed. Screen direction never flips. Only the subjects defined above appear in the foreground.
+    No text, subtitles or logos appear on screen.
+  zh: >-
+    目标视频是照片级写实的真人奇幻大片：真实的女演员穿实物戏服，用大画幅数字电影机和变形宽银幕镜头拍摄，高端视觉特效合成进实拍。
+    脸是看得见皮肤纹理的真人脸；头发和布料随风运动，有真实的重量。所有动作都是真实世界的速度。画面方向不翻转。
+    前景只出现上面定义的主体。画面上没有文字、字幕或标志。
+
+# ---- 声线：每个说话人一句，全片逐字沿用 ----
+voices:
+  GEM: {en: "a young female voice around twenty, cool and clear mid-pitch, calm and measured pace", zh: "约二十岁的年轻女声，清冷通透的中音，语速平稳克制"}
+  GPT: {en: "a mature young female voice, smooth and elegant, arrogant and slightly drawling", zh: "成熟的年轻女声，圆润优雅，傲慢，尾音略拖"}
+
+# ---- 参考图库：key -> 图片文件名（在 ComfyUI 的 input 目录里）+ 一句定义 ----
+# kind: person（默认）/ creature / scene；{p} 会换成 <Picture N>。
+# power：这个角色的力量设定，各段 detailed_description 里会列出本段出场者的。
+characters:
+  GEM:
+    image: char_gemini_v3.png
+    name: {en: Gemini, zh: Gemini}
+    power: {en: "Gemini's power is blue-to-violet starlight", zh: "Gemini 的力量是蓝到紫的星光"}
+    define:
+      en: "the young actress playing Gemini in {p} (her face exactly as in the large close-up on the left of that picture, her costume as in the three full-body views on the right), about twenty, cold and serious; long wavy hair dyed from blue to violet; heterochromatic eyes, right eye blue and left eye gold; a purple-and-white off-shoulder outfit; she fights bare-handed and never holds a weapon"
+      zh: "{p}中饰演 Gemini 的年轻女演员（脸照那张图左边的大特写，服装照右边三个全身视图）：约二十岁，冷艳严肃；蓝到紫渐变的染色波浪长发；异色瞳，右眼蓝、左眼金；紫白相间的露肩服装；她赤手空拳作战，从不拿武器"
+  GPT:
+    image: char_gpt_v3.png
+    name: {en: GPT, zh: GPT}
+    power: {en: "GPT's power is silver-lavender light", zh: "GPT 的力量是银紫色的光"}
+    define:
+      en: "the young actress playing GPT in {p} (face from the large close-up on the left, costume from the full-body views on the right), about twenty-three, tall and arrogant; floor-length wavy silver-white hair; a white ruffled gown; one long straight double-edged longsword, a solid steel blade and real metal, never a beam of light, held in her right hand with a forward grip, the same shape in every shot"
+      zh: "{p}中饰演 GPT 的年轻女演员（脸照左边大特写，服装照右边全身视图）：约二十三岁，高挑傲慢；银白色及地波浪长发；白色荷叶边长礼服；手里只有一把笔直的双刃长剑，实心钢剑身，是真金属，绝不是光束，始终右手正手握剑，每个镜头形状一样"
+  DRAGON:
+    image: summon_dragon.png
+    kind: creature
+    name: {en: the Silver Dragon, zh: 银龙}
+    define:
+      en: "GPT's summoned creature from {p}: a colossal eastern dragon made of dense glowing silver-white light and glittering scale particles; it is light, not flesh and not a thin beam"
+      zh: "{p}中 GPT 召唤出的巨物：一条由浓密发光的银白色光和闪烁鳞片光粒构成的巨大东方龙；它是光，不是血肉，也不是细光束"
+  ARENA:
+    image: scene_arena_intact.png
+    kind: scene
+    name: {en: the arena, zh: 论剑台}
+    define:
+      en: "the floating circular stone dueling arena from {p}, a real location: a weathered granite disc above a sea of clouds at sunset, eight black pillars with blue flames on top, tiered stone stands, a tall stele at the far rim"
+      zh: "{p}中漂浮的圆形石制论剑台，一处真实的外景地：夕阳下云海之上的花岗岩巨盘，八根柱顶燃着蓝火的黑色巨柱，阶梯石看台，远端立着一座高大的石碑"
+
+# ---- 状态表里的固定说法：同一个状态永远用同一句话，状态改变前一字不变 ----
+# label / applies 只给 make_full_script.py 生成"全片状态表"用。
+phrases:
+  A0: {label: "擂台 · 完好", applies: "全片开头起", en: "{ARENA} is intact: all eight black pillars stand with blue flames on top.", zh: "{ARENA}完好：八根黑色巨柱都立着，柱顶燃着蓝火。"}
+  LIGHT: {label: "光线", applies: "擂台各段", en: "Golden sunset light, the low sun at screen right.", zh: "金色夕阳光，低垂的太阳在画面右侧。"}
+  SIDES: {label: "方位", applies: "全片", en: "The camera stays on the near side of the line between the two fighters: Gemini on the left half at screen left facing right, GPT on the right half at screen right facing left. Nobody else is on the arena floor.", zh: "镜头始终留在两人连线的近侧：Gemini 在左半边、画面左侧、面朝右，GPT 在右半边、画面右侧、面朝左。擂台地面上没有别的人。"}
+  G0: {label: "Gemini · 完好", applies: "g2–f1", en: "Gemini's outfit is intact and clean.", zh: "Gemini 的衣服完好干净。"}
+  P0: {label: "GPT · 完好", applies: "g2–f1", en: "GPT's gown and silver-white hair are intact and clean.", zh: "GPT 的礼服和银白长发完好干净。"}
+
+# ---- 预设：每种戏的默认文字（可省略；这里演示怎么放一句节奏句）----
+kinds:
+  fight:
+    context:
+      en: "The pace is fast and violent from the first frame to the last and accelerates into the end: every beat is quick, short and snappy, and the video ends in the middle of motion, on an impact. Each shot keeps exactly the time range written for it."
+      zh: "节奏从第一帧到最后一帧都又快又猛，越到结尾越快：每一拍都快、短、干脆，结尾停在动作进行中的一次冲击上。每个镜头严格按写明的时间段。"
+
+segments:
+# ======================= 文戏：不写时间码，事件挂在台词和动作上，不挂 LoRA =======================
+- id: g2
+  title: 开场对峙
+  kind: dialogue
+  seconds: 8
+  refs: [GPT, GEM, ARENA]            # 顺序就是 <Subject 1>、<Subject 2>……也是参考图的顺序
+  # first: "@g1"                      # 首帧锚点：上一段实际生成的最后一帧（也可以写 input 里的图片名）
+  why: "上一段停在完整节点，硬切到这里；站位照上一段结尾"   # 只给 make_full_script.py 的"衔接原因"用
+  summary:
+    en: "Three hard-cut shots: GPT mocks Gemini from across the arena; Gemini's close-up as she answers coldly; a wide shot that holds on the two of them facing each other."
+    zh: "三个硬切镜头：GPT 隔着擂台嘲讽 Gemini；Gemini 近景冷冷回应；大全景停在两人对峙。"
+  context:
+    en: "The mood is cold contempt on one side and held-back anger on the other. Everyone walks into position first and speaks after."
+    zh: "情绪是一边冷冷轻蔑、一边压着怒气。先走到位，再开口。"
+  positions:
+    en: "{@A0} {@LIGHT} {@SIDES} {GPT} stands at screen right, her longsword resting point-down on the stone in her right hand, her chin raised. {GEM} stands at screen left with her hands empty at her sides. The two are ten strides, about eight metres, apart and neither moves. {@G0} {@P0}"
+    zh: "{@A0}{@LIGHT}{@SIDES}{GPT}站在画面右侧，右手持长剑，剑尖朝下抵在石板上，下巴微抬。{GEM}站在画面左侧，双手空着垂在身侧。两人相距十步、约八米，谁都不挪步。{@G0}{@P0}"
+  shots:
+  - en: "A medium shot of {GPT} at screen right with the sunset behind her. She tilts her head and (S1), in {V_GPT}, says with a faint sneer, <d>[Chinese]就这点本事，也敢回来？</d> She closes her mouth into a smug half-smile and listens. The camera pushes in slowly."
+    zh: "{GPT}的中景，她在画面右侧，身后是夕阳。她偏过头，(S1) 用{V_GPT}带着一丝冷笑说：<d>就这点本事，也敢回来？</d> 她闭上嘴，嘴角挂着得意的半笑，听对方回话。镜头缓缓推近。"
+  - en: "Hard cut to a close-up of {GEM} in three-quarter profile, wind lifting her hair. Her lips stay closed while she lets the words land, then (S2), in {V_GEM}, she says calmly, <d>[Chinese]上次你出题，这次换我。</d> GPT is silent and her lips are closed. Static shot."
+    zh: "硬切到{GEM}四分之三侧脸的特写，风吹起她的头发。她闭着嘴让那句话落地，然后 (S2) 用{V_GEM}平静地说：<d>上次你出题，这次换我。</d> GPT 不说话，嘴唇闭着。静止镜头。"
+  - en: "Hard cut to a wide low shot across the whole arena: {GEM} at screen left and {GPT} at screen right face each other over the empty stone, the pillars and stands behind them. The camera holds on the standoff."
+    zh: "硬切到横跨整个擂台的低位大全景：{GEM}在画面左侧、{GPT}在画面右侧，隔着空旷的石板相对而立，身后是巨柱和看台。镜头停在对峙上。"
+  soundscape:
+    en: "Wind across the arena, the faint ring of steel on stone, a low crowd murmur, then silence on the last shot."
+    zh: "风掠过擂台，钢剑抵着石板的轻微金属声，低低的人群议论，最后一个镜头归于寂静。"
+
+# ======================= 武戏：每个镜头、每一拍都写时间码；打斗中不说话，只有招牌大招喊一声；挂武戏 LoRA 链 =======================
+- id: f1
+  title: 第一轮对轰
+  kind: fight
+  seconds: 8
+  refs: [GPT, GEM, DRAGON, ARENA]
+  # ctx: "@f0"                        # 接续上一段：把上一段末尾 22 帧加音频锚在第 0 帧，拼接时剪掉（见 continuation.md）
+  why: "g2 停在对峙的完整节点，硬切进入第一招"
+  summary:
+    en: "Two hard-cut shots in 8 seconds: GPT hurls the Silver Dragon out of an arc of her blade; Gemini's star-fire slams into the dragon's head and drives it back."
+    zh: "两个硬切镜头，共 8 秒：GPT 从剑光里甩出银龙；Gemini 的星火砸在龙头上，把它轰退。"
+  context:
+    en: "Fixed geography: the arena floor is as wide as a stadium, each black pillar is about five times a person's height, and the Silver Dragon is far longer than the arena is wide. Both fighters are ordinary human height. Nothing catches fire unless it is written."
+    zh: "固定的空间：擂台地面像体育场那么大，每根黑色巨柱约五个人高，银龙比擂台还长得多；两人都是普通人的身高。除非写明，没有任何东西着火。"
+  positions:
+    en: "{@A0} {@LIGHT} {@SIDES} {GEM} stands at screen left in a low stance, starlight gathering around both hands. {GPT} hangs in the air at screen right, her longsword raised in her right hand. The two are twenty strides, about fifteen metres, apart; nobody changes distance inside a shot. {@G0} {@P0}"
+    zh: "{@A0}{@LIGHT}{@SIDES}{GEM}站在画面左侧，压低身形，双手周围聚着星光。{GPT}悬在画面右侧的空中，右手举着长剑。两人相距二十步、约十五米，同一个镜头里谁都不改变间距。{@G0}{@P0}"
+  shots:
+  - en: "0.0–4.0 s. Framing: a 35mm lens low behind Gemini's left shoulder, tilted up, GPT high in the air at screen right. Camera: Crane Up with large amplitude at fast speed, rising after GPT past the pillar tops.\n- 0.0–1.2 s: GPT beats her wings and rockets up, flicking the longsword across the sky; a great arc of silver light pours off the blade.\n- 1.2–2.6 s: {DRAGON} bursts head first out of the arc and uncoils across half the sky, dozens of times larger than she is. GPT (S1), in {V_GPT}, shouts, <d>[English]Skybreaker!</d>\n- 2.6–4.0 s: the dragon dives at the arena with its jaws open.\nAt 4.0 s, hard cut."
+    zh: "0.0–4.0 秒。起始机位：35mm 镜头，低位在 Gemini 左肩后，仰拍，GPT 在画面右侧高空。运镜：大幅度升降镜头快速上升，追着 GPT 越过柱顶。\n- 0.0–1.2 秒：GPT 振翅直冲上天，长剑横扫过天空；一道巨大的银色光弧从剑上倾泻而出。\n- 1.2–2.6 秒：{DRAGON}从光弧里头先冲出来，在半边天空里舒展开，比她大几十倍。GPT (S1) 用{V_GPT}喊：<d>Skybreaker!</d>\n- 2.6–4.0 秒：龙张着巨口朝擂台俯冲。\n4.0 秒，硬切。"
+  - en: "4.0–8.0 s. Framing: a 24mm lens at floor level at the side of the arena, the pillars behind, Gemini small at screen left and the head of {DRAGON} filling the right half of the frame. Camera: Dolly In with medium amplitude at fast speed, then a violent jolt on impact.\n- 4.0–5.2 s: Gemini thrusts both palms forward and a roaring river of blue-violet star-fire, each bolt as big as a person, streaks up to meet {DRAGON}.\n- 5.2–6.6 s: the star-fire slams into the head of {DRAGON} in a white-violet explosion taller than the pillars, scale-light and sparks blasting outward, and the head is hurled backward.\n- 6.6–8.0 s: the shockwave rolls across the whole floor and the frame floods with white light at the peak of the blast.\nThe video ends here, in the middle of the impact."
+    zh: "4.0–8.0 秒。起始机位：24mm 镜头，贴着擂台一侧的地面，身后是巨柱，Gemini 在画面左侧很小，{DRAGON}的头占满画面右半边。运镜：中幅度快速推进，撞击时猛地一震。\n- 4.0–5.2 秒：Gemini 双掌向前一推，一条每颗都有人那么大的蓝紫色星弹光河咆哮着迎向{DRAGON}。\n- 5.2–6.6 秒：星火砸在{DRAGON}的头上，炸成一团比巨柱还高的白紫色爆炸，鳞光和火星向外迸射，龙头被轰得向后飞去。\n- 6.6–8.0 秒：冲击波扫过整个地面，爆炸最高点画面被白光淹没。\n视频在这里结束，停在冲击进行当中。"
+  soundscape:
+    en: "A wingbeat, a hissing arc of light, a rising roar, a colossal collision and a shockwave rolling across stone; no other words."
+    zh: "一记振翅，光弧的嘶声，渐强的咆哮，巨大的相撞和扫过石板的冲击波；没有别的台词。"

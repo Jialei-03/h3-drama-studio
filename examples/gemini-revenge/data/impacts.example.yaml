@@ -1,0 +1,38 @@
+# 冲击表：scripts/impact_frames.py 的输入。每处冲击 = 一张九宫格图 + 一行位置。
+#   python3 scripts/impact_frames.py impacts.example.yaml film.mp4 film_impact.mp4 --dry-run   # 先看时间表
+# 帧号对应"当前这版成片"的时间线（不是秒）；峰值帧用 --find-peak 找，再肉眼确认。
+# 格号从 1 起，按九宫格从左到右、从上到下数：1 2 3 / 4 5 6 / 7 8 9。
+# 约定（来自作者的定稿）：第 4 格是纯特效、最亮的那一格，所以 peak_panel 默认 4；之前用 2、3 两格，之后用 5（或不用）。
+
+fps: 24
+zoom: 1.08            # 每格第 1 帧放大到 108%，第 2 帧回到 100%
+panel_frames: 2       # 每格停留 2 帧（1 帧一闪太乱，6 帧会让画面像卡住）
+gap_frames: 1         # 格与格之间隔 1 帧原画面
+margin: 5             # 裁格子时四周各让 5 像素，去掉分隔线
+negative_pattern: "###..###"   # 负片：# = 负片帧，. = 原画面；紧接在最后一格之后（再空 negative_delay 帧）
+negative_delay: 1
+
+# 剪过片后：剪点之后的所有帧号整体前移。只加一行，下面的 peak_frame 不用逐个改（rough-cut.md 第 6 节）。
+# shifts:
+#   - {at_frame: 1000, delta_frames: -20}
+
+impacts:
+  - name: dragon_mouth              # 只用于终端输出；例：龙口扑向镜头
+    grid: grids/m1.png              # 从"插入位置那一帧"生成的九宫格；相对路径相对于本文件
+    peak_frame: 2239                # 声响峰值那一帧 = 最亮格的第 1 帧
+    before: [2, 3]                  # 最亮格之前依次放哪两格
+    after: []                       # 最亮格之后放哪几格
+
+  - name: twin_summons_burst        # 例：两个召唤物炸开（有声响，爆炸后接负片）
+    grid: grids/m2.png
+    peak_frame: 2625
+    before: [2, 3]
+    after: [5]
+    negative: true                  # 结果瞬间（爆炸、白光吞没）才用负片
+
+  - name: light_blade_hits_arena    # 例：光刃砍中擂台的白光
+    grid: grids/m4.png
+    peak_frame: 3034
+    before: [2, 3]
+    after: [5]
+    negative: true

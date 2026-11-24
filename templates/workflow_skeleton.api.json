@@ -1,0 +1,178 @@
+{
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "your_h3_model.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "your_text_encoder.safetensors",
+   "type": "minimax",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "your_video_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "your_audio_vae.safetensors"
+  }
+ },
+ "5": {
+  "class_type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "placeholder.png"
+  }
+ },
+ "7": {
+  "class_type": "MiniMaxH3ReferenceToVideo",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ],
+   "audio_vae": [
+    "4",
+    0
+   ],
+   "prompt": "placeholder",
+   "width": 1024,
+   "height": 576,
+   "length": 124,
+   "ref_image_size": "match",
+   "ref_images.ref_image_0": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "BasicGuider",
+  "inputs": {
+   "model": [
+    "5",
+    0
+   ],
+   "conditioning": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "KSamplerSelect",
+  "inputs": {
+   "sampler_name": "euler"
+  }
+ },
+ "10": {
+  "class_type": "ManualSigmas",
+  "inputs": {
+   "sigmas": "1, .9882, .973, .9524, .9231, .878, .8, .6316, .4737, .1579, 0"
+  }
+ },
+ "11": {
+  "class_type": "RandomNoise",
+  "inputs": {
+   "noise_seed": 0
+  }
+ },
+ "12": {
+  "class_type": "SamplerCustomAdvanced",
+  "inputs": {
+   "noise": [
+    "11",
+    0
+   ],
+   "guider": [
+    "8",
+    0
+   ],
+   "sampler": [
+    "9",
+    0
+   ],
+   "sigmas": [
+    "10",
+    0
+   ],
+   "latent_image": [
+    "7",
+    1
+   ]
+  }
+ },
+ "13": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "12",
+    1
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "14": {
+  "class_type": "VAEDecodeAudio",
+  "inputs": {
+   "samples": [
+    "12",
+    1
+   ],
+   "vae": [
+    "4",
+    0
+   ]
+  }
+ },
+ "15": {
+  "class_type": "CreateVideo",
+  "inputs": {
+   "images": [
+    "13",
+    0
+   ],
+   "audio": [
+    "14",
+    0
+   ],
+   "fps": 24.0
+  }
+ },
+ "16": {
+  "class_type": "SaveVideo",
+  "inputs": {
+   "video": [
+    "15",
+    0
+   ],
+   "filename_prefix": "h3_drama/example",
+   "format": "auto",
+   "codec": "auto"
+  }
+ }
+}

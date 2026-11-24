@@ -1,0 +1,75 @@
+# 复制为 config.yaml 后填写。config.yaml 已在 .gitignore 里，不会被提交。
+# 密钥不要写在这里：只写环境变量的名字。
+
+host:
+  ssh: ""                 # 出片主机的 SSH 别名或 user@地址；出片和剪辑在同一台机器上就留空
+  comfyui_url: "http://127.0.0.1:8188"
+  comfyui_output: ""      # 主机上 ComfyUI 的 output 目录
+  comfyui_input: ""       # 主机上 ComfyUI 的 input 目录（接续/首尾帧锚点要把截出的帧和片段放进去；参考图也要事先放在这里）
+  queue_dir: ""           # 主机上放 shots.json / results.json 的目录
+  ffmpeg: ""              # 主机上 ffmpeg 的路径；留空就用 PATH 里的 ffmpeg
+  output_subdir: "h3_drama"   # 保存节点的文件名前缀目录：成片会落在 comfyui_output/<这个目录>/<id>_t<take>_*.mp4
+
+models:                   # 填你模型库里的文件名
+  unet: ""
+  text_encoder: ""
+  latent_upscaler: ""
+  fight_loras: []         # 武戏 LoRA 链：[{name: "", strength: 0.0}, ...]
+
+image_api:                # 出参考图用，任何兼容 OpenAI 图像接口的服务
+  base_url_env: "IMAGE_API_BASE"
+  key_env: "IMAGE_API_KEY"
+  model: ""
+  size: "1536x1024"       # 出图尺寸，宽x高
+
+project:
+  dir: ""                 # 本片的工作目录
+  fps: 24
+  width: 1536
+  height: 864
+
+fonts:                    # 字体不随仓库分发，也没有系统路径默认值；路径里也可以写成 "文件#序号"
+  zh: ""                  # 字幕中文字体文件路径（render_subs.py / render_lyrics.py）
+  zh_index: 0             # .ttc 字体集里要用的那一款的序号；.ttf / .otf 填 0
+  en_italic: ""           # 歌词英文斜体衬线字体文件路径（render_lyrics.py）
+  en_italic_index: 0
+  symbol: ""              # 可选：画歌词行首 ♪ 用的、带音符字形的字体；不填就用 zh 画 ♪（显示成方框时才需要）
+  symbol_index: 0
+
+# ---- 采样配方：build_shots.py 写进每条 shot 的默认值（现用配方，见 skills/h3-video/references/recipes.md）----
+recipe:
+  stage1: {w: 1024, h: 576, sampler: euler, sigmas: "1, .9882, .973, .9524, .9231, .878, .8, .6316, .4737, .1579, 0"}
+  shift: [12, 3]                                        # MiniMaxH3SigmaShift：[视频, 音频]
+  up2: {w: 1536, h: 864, sched: [beta, 14], split: 8, sampler: euler}   # 二采宽高必须是 32 的倍数
+  save_stage1: false                                    # true：同时把一采结果另存成 _stage1 视频，方便对比
+
+# ---- 你自己的 ComfyUI 工作流：scripts/drama_queue.py 按这张表改写它（仓库不带工作流文件）----
+# 先在 ComfyUI 里打开你自己的 H3 工作流，用菜单“导出 (API)”得到 json，填到 api_json；
+# 再把下面每个角色对应到 json 里的节点编号（节点右上角的数字，或直接看 json 的键）。
+# 下面填的编号对应 templates/workflow_skeleton.api.json（手写骨架，仅用来试 dry-run 和 check-map），换成你自己的。
+# 填完先跑：python3 scripts/drama_queue.py check-map
+# 每个角色 input 不写就用括号里的默认名；说明和限制见 skills/h3-video/references/queue.md“接入你自己的工作流”。
+workflow:
+  api_json: ""            # 例：templates/workflow_skeleton.api.json
+  drop_nodes: []          # 要从你的导出里删掉的节点编号（例如你自己的工作流里原有的 LoRA 加载器；删了之后不能再有节点引用它们）
+  nodes:
+    unet:         {node: "1",  input: unet_name}        # UNETLoader，主模型文件名
+    clip:         {node: "2",  input: clip_name}        # CLIPLoader，文本编码器文件名
+    prompt:       {node: "7",  input: prompt}           # MiniMaxH3ReferenceToVideo，正向提示词
+    width:        {node: "7",  input: width}            # 一采宽（如果你的宽高来自别的原始值节点，就填那个节点和它的输入名）
+    height:       {node: "7",  input: height}
+    length:       {node: "7",  input: length}           # 帧数
+    ref_size:     {node: "7",  input: ref_image_size}   # 参考图尺寸策略 match/max
+    ref_images:   {node: "7",  prefix: "ref_images.ref_image_"}   # 参考图输入的名字前缀，后面接 0、1、2……
+    seed:         {node: "11", input: noise_seed}       # RandomNoise，一采和二采共用
+    sampler:      {node: "9",  input: sampler_name}     # KSamplerSelect，一采采样器
+    sigmas:       {node: "10", input: sigmas}           # ManualSigmas，一采 sigma；shot 里写 sched 时整个节点会被换成 BasicScheduler
+    model_in:     {node: "5",  input: model}            # LoRA 链和 SigmaShift 的出口：链尾接到这个节点的 model 输入
+    cond:         {node: "7"}                           # 条件节点：输出0=正向条件，输出1=空潜空间
+    guider:       {node: "8"}                           # BasicGuider
+    pass1:        {node: "12"}                          # 一采 SamplerCustomAdvanced
+    video_vae:    {node: "3"}                           # 视频 VAELoader
+    audio_vae:    {node: "4"}                           # 音频 VAELoader
+    decode_video: {node: "13", input: samples}          # VAEDecode：samples 要直接接 pass1 的输出1
+    decode_audio: {node: "14", input: samples}          # VAEDecodeAudio：同上
+    save:         {node: "16", input: filename_prefix}  # SaveVideo

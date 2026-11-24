@@ -1,0 +1,62 @@
+# 检查规则示例：scripts/check_script.py 的 --rules。
+# 脚本自带的通用检查（时长、占位符、站位人物是否挂图、武戏时间码和台词、衔接锚点）不用在这里写；
+# 这里放"你的片子"踩过的坑。下面的例子来自作者的片子，换成你自己的。
+#
+# 每条规则都可以加：ids（只查这些段）、except_ids（这些段不查）、kinds（只查 dialogue / fight）、
+# scope（在哪段文字里找：positions 站位 / body 镜头正文 / detail 风格段+站位+镜头 / prompt 整个提示词）、message（报错时说的话）。
+
+# ---- 数字上限（不写就用脚本默认值）----
+max_seconds: 12             # 任何一段的上限
+fight_max_seconds: 10       # 武戏上限，超过就拆段
+ctx_max_seconds: 9.9        # 接续段（ctx）新内容的上限；含 22 帧接续总帧数不超过 max_frames
+max_frames: 260
+max_chars_per_second: 5     # 文戏台词预算
+
+# ---- 武戏：招牌大招是唯一允许的台词（英文喊一声）----
+signature_moves: [Skybreaker, Supernova]
+fight_required_phrases:
+  - "exactly the shots written below"      # 每段武戏都要有"视频只由下面这几个镜头组成"
+
+# ---- 禁用词表：整段提示词里出现就报错（不分大小写的子串）----
+# 这个流程没有负面提示词，速度和停顿类的否定词会把"慢"和"停住"带进画面，所以一律写成正面描述。
+banned_words:
+  - "no slow motion"
+  - "never pauses"
+  - "no freeze frame"
+  - "never ends on a held frame"
+
+# ---- 站位里的人物是否挂了参考图 ----
+# 跑 check_script.py 时加 --data segments.yaml，会按角色表自动检查；这里只补角色表管不到的：
+ref_required:
+  - {pattern: "Silver Dragon|dragon of light", image: summon_dragon.png, scope: detail, message: "银龙"}
+
+# ---- 项目专属的禁用写法：pattern 命中，且前后一句话里没有 unless 的限定词，就报错 ----
+banned:
+  - id: grip                # 持械手：作者的角色必须右手正手握剑，两次画反过
+    pattern: '\b(left hand|reverse grip)\b'
+    unless: 'never a reverse grip|never in her left hand|back of her left hand'
+    message: "持械手写成了左手或反手，没有带“绝不”的限定"
+  - id: fire                # 没有来由的着火被点名过
+    pattern: '\b(catches fire|on fire|burning)\b'
+    unless: 'nothing catches fire|unless it is written|nothing on her is burning|sun|rim light'
+    message: "出现着火/燃烧，却没有来由或限定"
+  - id: lens                # 不要正脸摆拍
+    pattern: 'looks? (straight )?into the (lens|camera)|faces the camera directly'
+    unless: 'nobody|never|not '
+    message: "有人看镜头"
+  - id: seating             # 座位左右反了：前排 DeepSeek 只能在画面左，豆包只能在中间偏右
+    pattern: 'DeepSeek[^.;,]{0,25}at screen right|Doubao[^.;,]{0,25}at screen left'
+    message: "前排座位左右反了"
+
+# ---- 某个状态不能出现在它发生之前的段里（按 shots.json 里的顺序）----
+not_before:
+  - {pattern: '\bcrater\b', before: f8, message: "炮击后才有的坑出现得太早"}
+
+# ---- 必须写的句子（正则）----
+required:
+  - {pattern: "N/A", scope: prompt, message: "non_diegetic_music 要写 N/A（配乐在后期统一加）"}
+
+# ---- 衔接锚点的识别句（默认值和 build_shots.py 自动写进去的句子一致；改了写法才需要改这里）----
+# anchor:
+#   opening_regex: "opens exactly on the anchored first frame|opens in the middle of the previous shot"
+#   positions_regex: "Continuing from the previous frame"

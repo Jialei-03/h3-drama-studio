@@ -1,0 +1,40 @@
+# 片段清单：scripts/splice.py 的输入。每条一个片段，按播放顺序，改稿时只改清单里的一行。
+#   python3 scripts/splice.py clips.example.yaml -o build/full.mp4 --fix-audio
+#   python3 scripts/splice.py clips.example.yaml -o build/fight_only.mp4 --group fight --fix-audio
+# 这里只放几条做示意（《Gemini的复仇！》里 24 段的头几条）；文件名是作者的 take 编号，换成你自己的。
+# 清单里的相对路径相对于本文件所在目录；也可以写绝对路径。
+
+# output: build/full.mp4          # 输出（也可以用命令行 -o）
+# width: 1536                     # 不写就读 config.yaml 的 project.width / height / fps
+# height: 864
+# fps: 24
+prefer_suffixes: ["_接剪", "_接"]   # 同一段有多个版本时，取存在的第一个：先 _接剪（手工剪过内部）、再 _接（chain_join.py 的输出）、最后才是原片
+
+clips:
+  # ---- 开场：文戏，原片直接拼（不是接续段，不需要 _接）----
+  - file: opening/g1_t106.mp4
+    label: g1 开场           # 可选：只用于终端输出
+
+  - file: opening/g2b_t300.mp4
+    start_frame: 6           # 可选：丢掉前 6 帧（含）…
+    end_frame: 140           # 可选：…到第 140 帧之前（不含）。帧序号从 0 起，按这个文件自己的帧数。
+                             # 这是"剪帧"改稿的写法：不用另存一个 _接剪 文件，改数字即可
+
+  # ---- 打戏：逐段接续生成的片段 ----
+  - file: fight/f0a_t521.mp4
+    group: fight             # 可选：用 --group fight 只拼打戏段
+    chain: true              # 接续段：必须找到 _接剪 / _接 版本；找不到就报错，不允许退回原片（原片头部还带着 22 帧上下文）
+
+  - file: fight/f1_t535.mp4
+    group: fight
+    chain: true
+
+  # ---- 收尾 ----
+  - file: aftermath/f8_t561.mp4
+    group: aftermath
+    chain: true
+
+  # 一条也可以给候选列表：第一个存在的赢（这时不再自动找 _接 后缀）
+  # - file: [fight/f9a_t562_接剪.mp4, fight/f9a_t562_接.mp4]
+  #   chain: true
+  # exact: true 表示这条就用写的这个文件，不找后缀

@@ -1,0 +1,62 @@
+# 出图清单示例：scripts/kf_batch.py 的输入（定妆图、场景图、召唤物图、受损阶段场景图……批量并发出图）。
+# 出图接口来自 config.yaml 的 image_api（兼容 OpenAI 图像接口的服务；地址和密钥只从环境变量读）。
+# 清单里的相对路径都相对于这个 yaml 所在的目录。提示词是示范，用你自己的角色和画风替换。
+#
+# 用法：
+#   python3 scripts/kf_batch.py keyframes.example.yaml --dry-run          # 先看拼好的提示词，不联网
+#   python3 scripts/kf_batch.py keyframes.example.yaml --tag r1 --only scene_arena_stage2
+
+size: "1536x864"       # 宽x高；每条 job 里也可以单独写 size
+workers: 4             # 并发张数
+retries: 1             # 失败后再试几次（偶发超时、限流；同一个错出第二次要去看提示词）
+out_dir: out           # 输出目录：<out_dir>/<id>_<tag>.png，实际发出的提示词存在 <out_dir>/prompts/
+# model: ""            # 不写就用 config.yaml 的 image_api.model
+
+# ---- 每张图都加的几段文字（可空）----
+prefix: >-             # 最前面：画风。写成"真人实拍"，不要写成"不要 CG"（见 ref-images.md 第 3 节）
+  A still frame from a big-budget live-action fantasy film, 16:9: real actresses in practical costumes,
+  shot on a large-format digital cinema camera with anamorphic lenses, true-to-life skin texture, real fabric weave,
+  restrained cinematic colour grade. A photograph, not an illustration. No text.
+keep: >-               # 有参考图时的"保持原样"句，放在各参考图的定义句后面
+  Keep each character's face, hair and costume and the set's architecture exactly as in their images.
+world: >-              # 只有用到 scene: true 的参考图时才加：固定的空间
+  Fixed geography: the arena is a round stone platform about 120 metres across; eight black pillars stand evenly around its rim.
+suffix: "Low golden sunset light from the side, fine film grain."   # 最后一句：光线和质感
+
+# ---- 参考图库：名字 -> 文件 + 提示词里的称呼 + 一句定义 ----
+# define 里的 {p} 会换成 "image N"（N 是它在这张图的 refs 里的顺序）。
+# append：用到这个参考图时，附加在提示词末尾的一句（例：规定受损阶段的地面颜色，写成正面描述）。
+refs:
+  HERO:
+    file: refs/char_gemini_v3.png
+    name: Gemini
+    define: "The young woman with long blue-to-violet hair and a purple-and-white outfit in {p} is Gemini."
+  RIVAL:
+    file: refs/char_gpt_v3.png
+    name: GPT
+    define: "The young woman with long silver-white hair and a white ruffled gown in {p} is GPT."
+  ARENA:
+    file: refs/scene_arena_intact.png
+    name: the arena
+    scene: true
+    define: "The floating stone arena in {p}, with its cracked granite floor, black pillars crowned by blue flames and tiered stands, is the arena."
+    append: "The cracks in the floor are dark, dry grey stone."
+
+# ---- 要出的图：refs 的顺序就是传给接口的参考图顺序，第一张决定构图 ----
+jobs:
+- id: pair_wide           # 两人同框的宽景（检查两个角色放在一起像不像各自的定妆图）
+  refs: [ARENA, HERO, RIVAL]
+  size: "1536x864"
+  prompt: >-
+    A wide establishing frame of {ARENA} at sunset: {HERO} stands small at the left third of the floor facing right,
+    {RIVAL} hovers above the right third facing left, ten strides of empty stone between them.
+
+- id: scene_arena_stage2   # 受损阶段场景图：以原场景图为底编辑，只让地面受损、柱子永远不坏（见 ref-images.md 第 7 节）
+  refs: [ARENA]
+  prompt: >-
+    The same arena after the first exchange: a wide scorch mark and one long shallow trench across the left half of the floor,
+    a few chips of stone nearby; all eight pillars stand intact with their blue flames; the camera angle and lighting are unchanged.
+
+- id: concept_no_refs      # 不带参考图：走文生图接口
+  refs: []
+  prompt: "A stone arena floating above a sea of clouds at sunset, wide shot, no people."
