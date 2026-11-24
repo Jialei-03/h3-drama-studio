@@ -2,17 +2,17 @@
 
 什么时候读：想知道某个做法最初是谁想出来的、要去看原教程，或者要在自己的作品里署名时。
 
-本仓库的配方和方法来自多位创作者公开分享的视频、教程和工作流。这里只写**学到了什么**和出处，不收录他们的提示词原文，不分发他们的工作流、整合包或模型文件。要用，请去原作者那里取，并遵守他们的使用条款。所有链接目前都是"待补"，由仓库维护者补上。
+本仓库的配方和方法来自多位创作者公开分享的视频、教程和工作流。这里只写**学到了什么**和出处，不收录他们的提示词原文，不分发他们的工作流、整合包或模型文件。要用，请去原作者那里取，并遵守他们的使用条款。
 
 ## 创作者
 
 | 谁 | 学到了什么 | 在本仓库用在哪 | 链接 |
 |---|---|---|---|
-| 吃猪侠233 | 15 步手写 sigma、不挂 LoRA 的画质增强流；专属二采（一采 10 步 → 潜空间放大 → 二采在第 8 步切开，SigmaShift 12/3）；他的立场：差距在参考图和提示词，不为加速牺牲画质 | [recipes.md](recipes.md) 的整套采样结构，是现用配方的主要来源；先查他的做法再动手 | 待补 |
-| 金鱼（YZ） | "终极篇"二采的节点框架（吃猪侠说他的二采以此为基础）；DMAD 融合 LoRA 加 MysticXXX 去油的组合；速度滑块；武戏三件套 LoRA；人物参考图带大脸特写的做法 | [lora.md](lora.md) 的武戏链；人物参考图布局 | 待补 |
-| 惊尘 | 上下文接续：把上一段末尾约 22 帧加音频锚在第 0 帧；接缝处色差匹配（以新片第一帧为基准去匹配旧片末帧，强度 0.75）；潜空间放大模型和 int8 VAE 提速的信息 | 武戏逐段接续的 `ctx` 和 `chain_join.py` | 待补 |
-| WorkFisher | 短剧全流程：图像模型出人物、场景、道具，三视图，再用 H3 多图参考出成片；不靠精细时间码控制节奏、方位用画面坐标写、一镜只点一个主体；段间衔接上对"拿尾帧当首帧会劣化"的提醒 | 参考图流程和提示词方法（见 drama-preproduction、drama-scenes）；本仓库复刻过他第 12 期的链路 | 待补 |
-| 凌大壮 | AI 冲击帧教程：在后期插入由九宫格抽出的几帧冲击画面 | 后期的冲击帧（见 drama-postproduction） | 待补 |
+| 吃猪侠233 | 15 步手写 sigma、不挂 LoRA 的画质增强流；专属二采（一采 10 步 → 潜空间放大 → 二采在第 8 步切开，SigmaShift 12/3）；他的立场：差距在参考图和提示词，不为加速牺牲画质 | [recipes.md](recipes.md) 的整套采样结构，是现用配方的主要来源；先查他的做法再动手 | [B 站主页](https://space.bilibili.com/111985620) |
+| 金鱼（YZ） | "终极篇"二采的节点框架（吃猪侠说他的二采以此为基础）；DMAD 融合 LoRA 加 MysticXXX 去油的组合；速度滑块；武戏三件套 LoRA；人物参考图带大脸特写的做法 | [lora.md](lora.md) 的武戏链；人物参考图布局 | [B 站主页](https://space.bilibili.com/14843708)，[终极篇视频](https://www.bilibili.com/video/BV1LKJm6VELc) |
+| 惊尘 | 上下文接续：把上一段末尾约 22 帧加音频锚在第 0 帧；接缝处色差匹配（以新片第一帧为基准去匹配旧片末帧，强度 0.75）；潜空间放大模型和 int8 VAE 提速的信息 | 武戏逐段接续的 `ctx` 和 `chain_join.py` | [B 站主页](https://space.bilibili.com/30070651)，[上下文接续方案视频](https://www.bilibili.com/video/BV11kHs6NEef) |
+| WorkFisher | 短剧全流程：图像模型出人物、场景、道具，三视图，再用 H3 多图参考出成片；不靠精细时间码控制节奏、方位用画面坐标写、一镜只点一个主体；段间衔接上对"拿尾帧当首帧会劣化"的提醒 | 参考图流程和提示词方法（见 drama-preproduction、drama-scenes）；本仓库复刻过他第 12 期的链路 | [B 站主页](https://space.bilibili.com/17919458)，[GitHub](https://github.com/Work-Fisher/AIFISHER) |
+| 凌大壮 | AI 冲击帧教程：在后期插入由九宫格抽出的几帧冲击画面 | 后期的冲击帧（见 drama-postproduction） | [冲击帧教程视频](https://www.bilibili.com/video/BV1FGHw6bEKM) |
 
 ## 配方每一项出自哪里，本仓库改了什么
 
@@ -36,9 +36,9 @@
 
 | 资料 | 学到了什么 | 链接 |
 |---|---|---|
-| H3 视频提示词写作指南 | 参考素材写成 `<Picture 1>`、`<Video 1>`、`<Audio 1>`；分镜写 `[Shot N]`；对白用 `<d>`；综合描述、环境声、配乐三段结构 | 待补 |
-| 官方提示词 skill | 在参考生视频和多镜头两种格式间自动选择，并给出创意增强的维度。注意：作者本地保存的那份署名是 Hermes Agent、MIT 许可，是否由 MiniMax 本家发布未核实 | 待补 |
-| ComfyUI 官方 H3 教程 | 原生节点的搭法 | 待补 |
+| H3 视频提示词写作指南 | 参考素材写成 `<Picture 1>`、`<Video 1>`、`<Audio 1>`；分镜写 `[Shot N]`；对白用 `<d>`；综合描述、环境声、配乐三段结构 | [MiniMax-AI/MiniMax-H3 的 skills/h3-prompt-writing](https://github.com/MiniMax-AI/MiniMax-H3/tree/main/skills) |
+| 官方提示词 skill | 在参考生视频和多镜头两种格式间自动选择，并给出创意增强的维度。注意：作者当时用的是一份由第三方打包的副本（署名 Hermes Agent、MIT 许可）；MiniMax 官方仓库的 `skills/` 目录里有官方发布的提示词 skill，两者内容是否一致没有逐字比对 | [MiniMax-AI/MiniMax-H3 的 skills 目录](https://github.com/MiniMax-AI/MiniMax-H3/tree/main/skills) |
+| ComfyUI 官方 H3 教程 | 原生节点的搭法 | 未收录链接，见 ComfyUI 官方文档 |
 
 ## 第三方模型与 LoRA 的作者
 

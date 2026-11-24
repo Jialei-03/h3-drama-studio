@@ -17,7 +17,7 @@
 | 不挂 LoRA | 挂武戏 LoRA 链 |
 | [带声音的 MP4](assets/dialogue.mp4) | [带声音的 MP4](assets/fight.mp4) |
 
-完整成片《Gemini的复仇！》（3 分 44 秒）：链接待补。
+完整成片《Gemini的复仇！》（3 分 44 秒）已发布在抖音、小红书和 B 站，搜索片名即可找到。
 
 ## 我的配置
 
@@ -102,14 +102,14 @@ cp config.example.yaml config.yaml    # config.yaml 已在 .gitignore 里，不�
 
 ## 致谢
 
-本仓库的配方和方法学自多位创作者公开分享的视频、教程和工作流。这里只写学到了什么，不收录他们的提示词原文，不分发他们的工作流、整合包或模型文件；要用请去原作者那里取，并遵守他们的使用条款。配方每一项出自哪里、本仓库改了什么，见 [credits.md](skills/h3-video/references/credits.md)。所有链接目前都是"待补"。
+本仓库的配方和方法学自多位创作者公开分享的视频、教程和工作流。这里只写学到了什么，不收录他们的提示词原文，不分发他们的工作流、整合包或模型文件；要用请去原作者那里取，并遵守他们的使用条款。配方每一项出自哪里、本仓库改了什么，见 [credits.md](skills/h3-video/references/credits.md)。
 
-- **吃猪侠233**：现用配方的主要来源（15 步无 LoRA 画质增强流和"专属二采"的整体结构），以及"差距在参考图和提示词，不为加速牺牲画质"的立场。链接：待补
-- **金鱼**：二采的节点框架思路，DMAD 融合 LoRA 加 MysticXXX 的武戏链和速度滑块，人物参考图带大脸特写的做法。链接：待补
-- **惊尘**：上下文接续（上一段末尾 22 帧加音频锚在第 0 帧）和接缝色差匹配，武戏逐段接续的基础。链接：待补
-- **WorkFisher**：短剧全流程、多图参考，以及方位用画面坐标、一个镜头只点一个主体的提示词写法。链接：待补
-- **凌大壮**：AI 冲击帧教程，后期冲击帧的做法来自这里。链接：待补
-- **MiniMax**：H3 视频提示词写作指南和 ComfyUI 官方 H3 教程。链接：待补
+- **吃猪侠233**：现用配方的主要来源（15 步无 LoRA 画质增强流和"专属二采"的整体结构），以及"差距在参考图和提示词，不为加速牺牲画质"的立场。链接：[B 站主页](https://space.bilibili.com/111985620)
+- **金鱼**：二采的节点框架思路，DMAD 融合 LoRA 加 MysticXXX 的武戏链和速度滑块，人物参考图带大脸特写的做法。链接：[B 站主页](https://space.bilibili.com/14843708)，[终极篇视频](https://www.bilibili.com/video/BV1LKJm6VELc)
+- **惊尘**：上下文接续（上一段末尾 22 帧加音频锚在第 0 帧）和接缝色差匹配，武戏逐段接续的基础。链接：[B 站主页](https://space.bilibili.com/30070651)，[上下文接续方案视频](https://www.bilibili.com/video/BV11kHs6NEef)
+- **WorkFisher**：短剧全流程、多图参考，以及方位用画面坐标、一个镜头只点一个主体的提示词写法。链接：[B 站主页](https://space.bilibili.com/17919458)，[GitHub](https://github.com/Work-Fisher/AIFISHER)
+- **凌大壮**：AI 冲击帧教程，后期冲击帧的做法来自这里。链接：[冲击帧教程视频](https://www.bilibili.com/video/BV1FGHw6bEKM)
+- **MiniMax**：H3 视频提示词写作指南和 ComfyUI 官方 H3 教程。链接：[MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3)（提示词 skill 在仓库的 `skills/` 目录）
 - **模型和 LoRA 的作者**：Cobijada Hybrid 底模（Winnougan）、Mystic XXX（alcaitiff，来历见 [lora.md](skills/h3-video/references/lora.md) 的披露）、H3_Combat_V2 和 Motion_Repair_V2（四只兔子）、潜空间放大模型（LBH-123-AI）等，名单见 credits.md。
 
 ## 许可
